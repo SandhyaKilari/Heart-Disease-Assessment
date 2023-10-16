@@ -3,6 +3,7 @@ import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
 import altair as alt
+import hiplot as hip
 
 st.title('Heart Disease Dataset')
 st.caption('Presented by Sandhya Kilari')
@@ -38,3 +39,15 @@ if st.checkbox('Dataset'):
 
 if st.checkbox('Relation between "Target" and other variable'):
     my_function()
+
+# Visualization with HiPlot
+st.write("Heart Disease Dataset Visualization with HiPlot")
+selected_columns = st.multiselect("Select columns to visualize", df_heart.columns)
+
+# Create a DataFrame with the selected columns
+selected_data = df_heart[selected_columns]
+st.write(selected_data)
+
+# Create a HiPlot experiment with the selected data
+experiment = hip.Experiment.from_dataframe(selected_data)
+st.write(experiment)
