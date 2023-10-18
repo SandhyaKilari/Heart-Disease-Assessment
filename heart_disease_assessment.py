@@ -35,7 +35,11 @@ with tab1:
     st.markdown("**Attributes Information**")
     st.markdown("1. Age")
     st.markdown("2. Sex")
-    st.markdown('3. Chest Pain Type (cp: "Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic")')
+    st.markdown('3. cp: chest pain type
+    — Value 0: asymptomatic
+    — Value 1: atypical angina
+    — Value 2: non-anginal pain
+    — Value 3: typical angina')
     st.markdown("4. Resting Blood Pressure (trestbps) in mm Hg")
     st.markdown("5. Serum Cholesterol (chol) in mg/dL")
     st.markdown("6. Fasting Blood Sugar (fbs) > 120 mg/dL")
