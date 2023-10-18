@@ -195,9 +195,16 @@ with tab4:
     # Correlation based analysis
     correlation = df_heart['cp'].corr(df_heart['target'])
     st.subheader(f'Chest Pain Types vs. Heart Disease\nCorrelation: {correlation:.2f}')
-    plt.figure(figsize=(8, 6))  # Set a larger figure size
-    plot1 = sns.boxplot(data=df_heart, x='cp', y='target', color='blue')
-    st.pyplot(plot1.figure)
+    plt.figure(figsize=(12, 6))  # Adjusted for two side-by-side boxplots
+    cp_0 = df_heart[df_heart['cp'] == 0]
+    cp_1 = df_heart[df_heart['cp'] != 0]
+    plt.subplot(1, 2, 1)
+    plot1 = sns.boxplot(data=cp_0, x='cp', y='target', color='blue')
+    plt.title('Chest Pain Type 0')
+    plt.subplot(1, 2, 2)
+    plot2 = sns.boxplot(data=cp_1, x='cp', y='target', color='green')
+    plt.title('Chest Pain Type 1-3')
+    st.pyplot(plot1.figure, plot2.figure)
     plt.clf()  # Clear the figure
     st.write("*Each box in the plot represents a different chest pain type (probably categorized into types like 0, 1, 2, or 3)*")
     st.write("*The box plot helps us to understand how chest pain types are related to the presence of heart disease. For example, we can observe whether a particular chest pain type is more common in individuals with or without heart disease based on the median and the distribution of data points.*")
