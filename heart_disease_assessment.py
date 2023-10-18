@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import altair as alt
 import hiplot as hip
+import numpy as np
 
 st.markdown("<h1 style='text-align: center; font-size: 35px;'>Heart Disease Dashboard</h1>", unsafe_allow_html=True)
 st.markdown(
@@ -22,6 +23,64 @@ st.sidebar.subheader("About the Application")
 st.sidebar.info("This web application will enable users to input their health attributes (e.g., age, sex, cholesterol levels, blood pressure, blood sugar level and more) and receive a risk assessment for heart disease. The app will provide a clear prediction that's easy to understand. It will also explain why each detail is important. This tool helps people understand their health and assists doctors when talking to patients.")
 sidebar_placeholder = st.sidebar.empty()
 
+def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal ):   
+ 
+    
+    # Pre-processing user input   
+    if sex=="male":
+        sex=1 
+    else: sex=0
+    
+    
+    if cp=="Typical angina":
+        cp=0
+    elif cp=="Atypical angina":
+        cp=1
+    elif cp=="Non-anginal pain":
+        cp=2
+    elif cp=="Asymptomatic":
+        cp=2
+    
+    if exang=="Yes":
+        exang=1
+    elif exang=="No":
+        exang=0
+ 
+    if fbs=="Yes":
+        fbs=1
+    elif fbs=="No":
+        fbs=0
+ 
+    if slope=="Upsloping: better heart rate with excercise(uncommon)":
+        slope=0
+    elif slope=="Flatsloping: minimal change(typical healthy heart)":
+          slope=1
+    elif slope=="Downsloping: signs of unhealthy heart":
+        slope=2  
+ 
+    if thal=="fixed defect: used to be defect but ok now":
+        thal=6
+    elif thal=="reversable defect: no proper blood movement when excercising":
+        thal=7
+    elif thal=="normal":
+        thal=2.31
+
+    if restecg=="Nothing to note":
+        restecg=0
+    elif restecg=="ST-T Wave abnormality":
+        restecg=1
+    elif restecg=="Possible or definite left ventricular hypertrophy":
+        restecg=2
+
+
+    user_input=[age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal]
+    user_input=np.array(user_input)
+    # user_input=user_input.reshape(1,-1)
+    # user_input=scal.fit_transform(user_input)
+    # prediction = model.predict(user_input)
+
+    return user_input
+
 tab1, tab2, tab3, tab4, tab5= st.tabs(["Introduction", "Statistical Analysis", "Data Visualization", 'Exploring Relationships', "Model Prediction"])
 
 with tab1:
@@ -34,18 +93,18 @@ with tab1:
     st.markdown(" ")
     st.markdown("**Attributes Information**")
     st.markdown("1. Age")
-    st.markdown("2. Sex (1 = male, 0 = female)")
-    st.markdown('3. cp: chest pain type (0: asymptomatic, 1: atypical angina, 2: non-anginal pain, 3: typical angina')
+    st.markdown("2. Sex")
+    st.markdown('3. Chest Pain Type (cp: "Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic")')
     st.markdown("4. Resting Blood Pressure (trestbps) in mm Hg")
     st.markdown("5. Serum Cholesterol (chol) in mg/dL")
-    st.markdown("6. Fasting Blood Sugar (fbs) > 120 mg/dl (1 = true; 0 = false)")
-    st.markdown('7. Resting Electrocardiographic Results (restecg) (0: "Nothing to note", 1: "ST-T Wave abnormality", 2: "Possible or definite left ventricular hypertrophy")')
+    st.markdown("6. Fasting Blood Sugar (fbs) > 120 mg/dL")
+    st.markdown('7. Resting Electrocardiographic Results (restecg: "Nothing to note", "ST-T Wave abnormality", "Possible or definite left ventricular hypertrophy")')
     st.markdown("8. Maximum Heart Rate Achieved (thalach)")
-    st.markdown("9. Exercise Induced Angina (exang) (1 = yes; 0 = no)")
-    st.markdown("10. oldpeak = ST depression induced by exercise relative to rest (ST segment — 0: downsloping; 1: flat; 2: upsloping)")
+    st.markdown("9. Exercise Induced Angina (exang)")
+    st.markdown("10. oldpeak = ST depression induced by exercise relative to rest")
     st.markdown("11. The slope of the peak exercise ST segment")
     st.markdown("12. Number of Major Vessels Colored by Fluoroscopy (ca): 0-3")
-    st.markdown("13. Thalium Stress Result (thal) (0 = normal; 1 = fixed defect; 2 = reversable defect)")
+    st.markdown("13. Thalium Stress Result (thal: 0 = normal; 1 = fixed defect; 2 = reversable defect)")
     st.markdown("**Reference Link:**")
     st.markdown("https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset")
 
@@ -244,5 +303,9 @@ with tab5:
     ca = st.selectbox('Number of Major Vessels (0-3) Colored by Fluoroscopy', range(0, 5, 1))
     thal = st.selectbox('Thalium Stress Result', range(1, 8, 1))
     
+
+    pred=preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal)
+
     if st.button("Estimate"):
+        st.write(pred)
         st.write("Need to create a model based on the attributes to predict the risk of getting a heart disease!!")
