@@ -15,7 +15,6 @@ st.markdown(
 url = "https://raw.githubusercontent.com/SandhyaKilari/Heart-Disease-Assessment/main/heart.csv"
 df_heart = pd.read_csv(url)
 df_heart = df_heart.drop(0)
-df_heart.dropna()
 
 
 # Information about the App
@@ -183,32 +182,42 @@ with tab3:
         plt.figure(figsize=(10, 8))
         heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
         st.pyplot(heatmap.figure)
-        st.markdown("*This heatmap will provide a visual representation of the correlations between all pairs of numerical variables in your dataset, helping you quickly identify which variables are strongly correlated with each other*")
+        st.markdown("*This heatmap will provide a visual representation of the correlations between all pairs of numerical variables in the dataset, helping you quickly identify which variables are strongly correlated with each other*")
 
         st.subheader("Pairplot")
         sns.set(style="ticks")
         pairplot = sns.pairplot(df_heart, hue="target", diag_kind="kde", markers=["o", "s"])
         st.pyplot(pairplot.figure)
-        st.markdown("*The pair plot will show scatter plots for all pairs of numerical variables in your dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
+        plt.clf()  # Clear the figure
+        st.markdown("*The pair plot will show scatter plots for all pairs of numerical variables in the dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
 
 with tab4:
     # Correlation based analysis
-    st.subheader("Cholesterol Levels vs. Heart Disease")
-    plot1 = sns.scatterplot(data=df_heart, x='chol', y='target', color='blue', alpha=0.5, label= "chol vs target")
+    correlation = df_heart['cp'].corr(df_heart['target'])
+    st.subheader(f'Chest Pain Types vs. Heart Disease\nCorrelation: {correlation:.2f}')
+    plt.figure(figsize=(8, 6))  # Set a larger figure size
+    plot1 = sns.boxplot(data=df_heart, x='cp', y='target', color='blue')
     st.pyplot(plot1.figure)
-    st.write("*High cholesterol levels are positively correlated with the presence of heart disease, indicating that high cholesterol is a risk factor*")
-
+    plt.clf()  # Clear the figure
+    st.write("*Each box in the plot represents a different chest pain type (probably categorized into types like 0, 1, 2, or 3)*")
+    st.write("*The box plot helps us to understand how chest pain types are related to the presence of heart disease. For example, we can observe whether a particular chest pain type is more common in individuals with or without heart disease based on the median and the distribution of data points.*")
+    
     # Feature Relationship
-    st.subheader("Age vs. Blood Pressure")
+    correlation = df_heart['age'].corr(df_heart['trestbps'])
+    st.subheader(f'Age vs. Blood Pressure\nCorrelation: {correlation:.2f}')
+    plt.figure(figsize=(10, 10))  # Set a larger figure size
     plot2 = sns.scatterplot(data=df_heart, x='age', y='trestbps', color='green', label= "age vs trestbps")
     st.pyplot(plot2.figure)
+    plt.clf()  # Clear the figure
     st.write("*Age and blood pressure are positively correlated, meaning that as people get older, their blood pressure tends to increase, which can be a risk factor for heart disease*")
 
-    correlation = df_heart['age'].corr(df_heart['target'])
-    st.subheader(f'Age vs. Heart Disease\nCorrelation: {correlation:.2f}')
-    plot3 = sns.scatterplot(data=df_heart, x='age', y='target', color='red', alpha=0.5, label= "age vs target")
+    correlation = df_heart['thalach'].corr(df_heart['target'])
+    st.subheader(f'Heart Rate vs. Heart Disease\nCorrelation: {correlation:.2f}')
+    plt.figure(figsize=(8, 6))  # Set a larger figure size
+    plot3 = sns.scatterplot(data=df_heart, x='thalach', y='target', color='red', alpha=0.5, label= "thalach vs target")
     st.pyplot(plot3.figure)
-    st.write("*The scatter plot show that older individuals tend to have a higher likelihood of heart disease, as the points cluster in the direction of increasing age and heart disease presence*")
+    plt.clf()  # Clear the figure
+    st.write("*The scatter plot show that individuals with higher heart rate tend to be more likelihood of heart disease, as the points cluster in the direction of increasing rate and heart disease presence*")
 
 with tab5:
     st.markdown("Can we establish a dependable predictive tool for early detection?")
