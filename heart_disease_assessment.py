@@ -121,6 +121,9 @@ with tab2:
     if st.checkbox('Correlation Matrix'):
         st.write('Pairwise correlation of columns, excluding NA/null values')
         st.write(df_heart.corr())
+    if st.checkbox('Missing Values'):
+        missing_values = df_heart.isnull().sum()
+        st.write(missing_values)
 
 with tab3:
     st.markdown('**Which critical risk factors substantially contribute to the occurrence of Heart Disease?**')
