@@ -16,16 +16,20 @@ st.markdown(
 url = "https://raw.githubusercontent.com/SandhyaKilari/Heart-Disease-Assessment/main/heart.csv"
 df_heart = pd.read_csv(url)
 df_heart = df_heart.drop(0)
+# df=df_heart
+# df_heart = df.drop(['slope', 'ca', 'thal'], axis=1)
 
+df_drop = df_heart
+
+df_drop = df_drop.drop(['slope', 'ca', 'thal'], axis=1)
 
 # Information about the App
 st.sidebar.subheader("About the Application")
 st.sidebar.info("This web application will enable users to input their health attributes (e.g., age, sex, cholesterol levels, blood pressure, blood sugar level and more) and receive a risk assessment for heart disease. The app will provide a clear prediction that's easy to understand. It will also explain why each detail is important. This tool helps people understand their health and assists doctors when talking to patients.")
 sidebar_placeholder = st.sidebar.empty()
 
-def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal ):   
+def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak):   
  
-    
     # Pre-processing user input   
     if sex=="male":
         sex=1 
@@ -51,19 +55,19 @@ def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,
     elif fbs=="No":
         fbs=0
  
-    if slope=="Upsloping: better heart rate with excercise(uncommon)":
-        slope=0
-    elif slope=="Flatsloping: minimal change(typical healthy heart)":
-          slope=1
-    elif slope=="Downsloping: signs of unhealthy heart":
-        slope=2  
+    # if slope=="Upsloping: better heart rate with excercise(uncommon)":
+    #     slope=0
+    # elif slope=="Flatsloping: minimal change(typical healthy heart)":
+    #       slope=1
+    # elif slope=="Downsloping: signs of unhealthy heart":
+    #     slope=2  
  
-    if thal=="fixed defect: used to be defect but ok now":
-        thal=6
-    elif thal=="reversable defect: no proper blood movement when excercising":
-        thal=7
-    elif thal=="normal":
-        thal=2.31
+    # if thal=="fixed defect: used to be defect but ok now":
+    #     thal=6
+    # elif thal=="reversable defect: no proper blood movement when excercising":
+    #     thal=7
+    # elif thal=="normal":
+    #     thal=2.31
 
     if restecg=="Nothing to note":
         restecg=0
@@ -73,7 +77,7 @@ def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,
         restecg=2
 
 
-    user_input=[age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal]
+    user_input=[age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak]
     user_input=np.array(user_input)
     # user_input=user_input.reshape(1,-1)
     # user_input=scal.fit_transform(user_input)
@@ -109,29 +113,32 @@ with tab1:
     st.markdown("https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset")
 
 with tab2:
-    if st.checkbox('Dataset'):
+    df=df_heart
+    if st.checkbox('Raw Data'):
         row = st.selectbox("Number of rows", range(1, 1025, 1))
         st.write(f"View the first {row} rows of the dataset")
-        st.table(df_heart.head(row))
+        st.table(df.head(row))
     if st.checkbox('Descriptive Statistics'):
-        st.write(df_heart.describe())
+        st.write(df.describe())
         st.write('Information about the data:')
-        st.write(f'Total Number of Samples: {df_heart.shape[0]}')
-        st.write(f'Number of Features: {df_heart.shape[1]}')
+        st.write(f'Total Number of Samples: {df.shape[0]}')
+        st.write(f'Number of Features: {df.shape[1]}')
     if st.checkbox('Correlation Matrix'):
         st.write('Pairwise correlation of columns, excluding NA/null values')
-        st.write(df_heart.corr())
+        st.write(df.corr())
     if st.checkbox('Missing Values'):
-        missing_values = df_heart.isnull().sum()
+        missing_values = df.isnull().sum()
         st.write(missing_values)
 
 with tab3:
+    categorical_columns = ['sex', 'cp', 'fbs', 'restecg', 'exang']
+    df_categorical = df_heart[categorical_columns]
     st.markdown('**Which critical risk factors substantially contribute to the occurrence of Heart Disease?**')
 
-    if st.checkbox('Individual Variable Distribution'):
-        st.markdown("This dataset contains many attributes that contributes to the presence or absence of heart disease")
-        variable = st.selectbox('Please choose preferred variable', ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal', 'target'])
-        distplot = sns.displot(data=df_heart, x=variable)
+    if st.checkbox('Distribution of Categorical Variables'):
+        st.markdown("Explore distribution of categorical variables that contributes to the presence or absence of heart disease")
+        variable = st.selectbox('Please choose preferred variable', categorical_columns)
+        distplot = sns.displot(data=df_categorical, x=variable)
         st.pyplot(distplot)
         if variable == 'age':
             st.markdown("*The age distribution appears to be slightly positively skewed, with a tail extending to the right. The mode of the distribution is around 50-60 years, indicating that this is the most common age in the dataset. However, there are several outliers on the higher age side, suggesting a few individuals with significantly older ages. The distribution is relatively wide, indicating a fair amount of variability in ages. There is also a secondary, smaller peak around 30-40 years, which could suggest the presence of a younger subgroup in the dataset*")
@@ -153,17 +160,11 @@ with tab3:
             st.markdown("*The distribution of the 'exang' variable indicates two categories: 'no exercise-induced angina' and 'exercise-induced angina.' Without detailed proportions, we can't assess the exact balance or imbalance, but this variable's distribution could be important in the context of a heart disease dataset. If 'exercise-induced angina' is prevalent, it might suggest a significant occurrence of angina during exercise among the individuals in the dataset*")
         if variable == 'oldpeak':
             st.markdown("*The distribution of the 'oldpeak' variable appears to be positively skewed, with a tail extending to the right. The peak of the distribution is around 1.5, indicating that this is the most common 'oldpeak' value in the dataset. The distribution is relatively wide, suggesting a notable variability in 'oldpeak' values. There are a few outliers on the higher 'oldpeak' side, which might represent individuals with exceptionally high stress on the heart during exercise*")
-        if variable == 'slope':
-            st.markdown("*The distribution of the 'slope' variable indicates that it has three distinct categories: 'upsloping,' 'horizontal,' and 'downsloping.' In this dataset, 'horizontal' appears to be the most common slope pattern, followed by 'downsloping' and 'upsloping.' These findings suggest that 'horizontal' is the predominant ST-segment slope pattern within the dataset*")
-        if variable == 'ca':
-            st.markdown("*The distribution of the 'ca' variable shows that it can take several values. Most notably, there is a significant presence of '0' values, indicating a substantial proportion of individuals with no major vessels colored by fluoroscopy. The distribution is right-skewed, suggesting that the majority of individuals in the dataset have fewer major vessels, but there are a few outliers with a higher number of major vessels*")
-        if variable == 'thal':
-            st.markdown("*The distribution of the 'thal' variable shows that the 'reversible defect' category is the most common, indicating that a significant proportion of the individuals in the dataset have this type of thallium stress test result. 'Normal' and 'fixed defect' are less prevalent. This distribution may have clinical implications, as the 'reversible defect' category might be associated with specific cardiac conditions that are more common in this dataset. Further analysis could explore the relationship between 'thal' types and health outcomes*")
         if variable == 'target':
             st.markdown("*The distribution of the 'target' variable indicates a binary outcome with two categories: '0' and '1.' In this dataset, it appears that '0' is the dominant category, suggesting a higher proportion of individuals with the absence of the target condition, while '1' represents the presence of the condition. This indicates an imbalance in the dataset, with a larger number of individuals not having the target condition*")
 
-    if st.checkbox('Relation between "Target" and other variable'):
-        df = df_heart.drop('target', axis=1)
+    if st.checkbox('Relation between "Target" variable and the features'):
+        df = df_drop.drop('target', axis=1)
         selected_variable = st.selectbox("Select the desired variable", df.columns)
         data_button = st.selectbox('Please choose preferred visualization', ['Scatter Plot', 'Histogram Plot', 'Distribution Plot'])
 
@@ -209,18 +210,10 @@ with tab3:
 
         if selected_variable == 'exang':
             st.write('*Most data points fall into two distinct clusters or patterns, it suggests a possible relationship between exercise-induced angina and the presence of heart disease*')
+        
         if selected_variable == 'oldpeak':
             st.write('*Data points are concentrated at lower "oldpeak" values for a "target" value of 0, it suggests that lower "oldpeak" values are associated with a lower likelihood of heart disease.*')
-        
-        if selected_variable == 'slope':
-            st.write('*Points appear scattered with no clear trend, it suggests that there may not be a strong relationship between the "slope" variable and the "target" variable*')
-        
-        if selected_variable == 'ca':
-            st.write('*Individuals with a higher number of major vessels (higher "ca" values) tend to have a "0" for the "target" variable (indicating no heart disease), it may suggest a negative correlation. In this case, a higher number of major vessels could indicate a lower likelihood of heart disease*')
-        
-        if selected_variable == 'thal':
-            st.write("*It suggests that individuals with that specific thal result are more likely to have heart disease and conversely*")
-	
+            	
     # HiPlot Visualization
     def save_hiplot_to_html(exp):
         output_file = "hiplot_plot_1.html"
@@ -228,6 +221,7 @@ with tab3:
         return output_file
         
     if st.checkbox('Heart Disease Dataset Visualization with HiPlot'):
+        df_heart = df_drop
         st.write('*This plot allows user to select required columns and visualize them using HiPlot. By systematically exploring the dataset, we can uncover relationships into how attributes may be correlated with the presence or absence of heart disease within specific age groups and clinical attribute ranges.*')
         selected_columns = st.multiselect("Select columns to visualize", df_heart.columns)
         selected_data = df_heart[selected_columns]
@@ -239,6 +233,7 @@ with tab3:
             st.write("No data selected. Please choose at least one column to visualize.")
     
     if st.checkbox("Visualization Techniques"):
+        df_heart=df_drop
         st.subheader('Correlation Heatmap')
         correlation_matrix = df_heart.corr()
         plt.figure(figsize=(10, 8))
@@ -302,12 +297,12 @@ with tab5:
     thalach = st.selectbox('Maximum Heart Rate Achieved', range(1, 300, 1))
     exang = st.selectbox('Exercise Induced Angina', ["Yes", "No"])
     oldpeak = st.number_input('Oldpeak (ST depression induced by exercise relative to rest)')
-    slope = st.selectbox('Heart Rate Slope', ("Upsloping: better heart rate with exercise (uncommon)", "Flatsloping: minimal change (typical healthy heart)", "Downsloping: signs of an unhealthy heart"))
-    ca = st.selectbox('Number of Major Vessels (0-3) Colored by Fluoroscopy', range(0, 5, 1))
-    thal = st.selectbox('Thalium Stress Result', range(1, 8, 1))
+    # slope = st.selectbox('Heart Rate Slope', ("Upsloping: better heart rate with exercise (uncommon)", "Flatsloping: minimal change (typical healthy heart)", "Downsloping: signs of an unhealthy heart"))
+    # ca = st.selectbox('Number of Major Vessels (0-3) Colored by Fluoroscopy', range(0, 5, 1))
+    # thal = st.selectbox('Thalium Stress Result', range(1, 8, 1))
     
 
-    pred=preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak,slope,ca,thal)
+    pred=preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak)
 
     if st.button("Estimate"):
         st.write(pred)
