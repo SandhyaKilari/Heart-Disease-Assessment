@@ -95,7 +95,7 @@ with tab1:
     st.markdown("**Dataset**")
     st.markdown("<div style='text-align: justify'>The Cleveland dataset which is widely used in heart disease research comprises 303 instances and 14 attributes, encompassing variables such as age, sex, chest pain type (cp), resting blood pressure (trestbps), serum cholesterol level (chol), fasting blood sugar (fbs), maximum heart rate achieved (thalach), oldpeak, thal, and the target variable indicating presence of heart disease in the patient (0 = no disease, 1 = disease)</div>", unsafe_allow_html=True)
     st.markdown(" ")
-    if st.button("Need to understand the attriibutes?"):
+    if st.button("Need to understand the attributes ?"):
         # Display the information when the button is clicked
         st.markdown("1. Age: Represents the age of persons in years")
         st.markdown("2. Sex: (1 = male, 0 = female)")
