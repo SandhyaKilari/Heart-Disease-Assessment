@@ -6,7 +6,7 @@ import altair as alt
 import hiplot as hip
 import numpy as np
 
-st.markdown("<h1 style='text-align: center; font-size: 35px;'>Heart Disease Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 35px;'>Heart Disease Assessment</h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size: 15px;'>Presented by Sandhya Kilari</p>",
     unsafe_allow_html=True
