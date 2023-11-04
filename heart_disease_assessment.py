@@ -16,7 +16,7 @@ st.markdown(
 url = "https://raw.githubusercontent.com/SandhyaKilari/Heart-Disease-Assessment/main/heart.csv"
 df_heart = pd.read_csv(url)
 df_heart = df_heart.drop(0)
-df_heart['sex'] = df_heart.sex.replace({1: "Male", 0: "Female"})
+#df_heart['sex'] = df_heart.sex.replace({1: "Male", 0: "Female"})
 
 df_drop = df_heart
 df_drop = df_drop.drop(['slope', 'ca', 'thal'], axis=1)
