@@ -507,3 +507,5 @@ with tab7:
     st.write("I'm excited to be a part of this project because it aligns perfectly with my passion for leveraging data to create meaningful solutions. I believe that by applying data science principles, we can solve real-world problems and make a positive difference.")
     st.write(" ")
     st.write("Feel free to reach out if you have any questions or just want to discuss data science, philosophy, or anything else that piques your curiosity!")
+    st.write(" ")
+    st.image('profile.jpeg', width=300)
