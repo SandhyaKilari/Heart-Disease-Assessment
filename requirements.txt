@@ -6,12 +6,3 @@ altair
 hiplot
 numpy
 scikit-learn
-sklearn.metrics
-sklearn.model_selection
-sklearn.preprocessing
-sklearn.naive_bayes
-sklearn.tree
-sklearn.neighbors
-sklearn.discriminant_analysis
-sklearn.linear_model
-sklearn.ensemble
