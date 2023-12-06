@@ -189,15 +189,19 @@ with tab3:
     if st.checkbox('Relation between "Target" variable and the features'):
         df = df_new.drop('target', axis=1)
         selected_variable = st.selectbox("Select the desired variable", df.columns)
-        data_button = st.selectbox('Please choose preferred visualization', ['Scatter Plot', 'Histogram Plot', 'Distribution Plot'])
+        data_button = st.selectbox('Please choose preferred visualization', ['Scatter Plot', 'Box Plot', 'Distribution Plot'])
 
         if data_button == 'Scatter Plot':
             scatter_plot = sns.scatterplot(data=data_vis, x=selected_variable, y='target', hue='sex')
             st.pyplot(scatter_plot.figure)
 
-        elif data_button == 'Histogram Plot':
-            histplot = sns.histplot(data=data_vis, x=selected_variable, y='target', binwidth=5, hue='sex')
-            st.pyplot(histplot.figure)
+        elif data_button == 'Box Plot':
+            box_plot = sns.boxplot(x='target', y=selected_variable, data=data_vis,palette='rainbow')
+            st.pyplot(box_plot.figure)
+
+        #elif data_button == 'Histogram Plot':
+            #histplot = sns.histplot(data=data_vis, x=selected_variable, y='target', binwidth=5, hue='sex')
+            #st.pyplot(histplot.figure)
 
         elif data_button == 'Distribution Plot':
             distplot = sns.displot(data=data_vis, x=selected_variable, y='target', hue='sex')
