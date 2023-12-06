@@ -1,3 +1,4 @@
+# Importing Necessary Libraries
 import streamlit as st
 import seaborn as sns
 import pandas as pd
@@ -6,33 +7,85 @@ import altair as alt
 import hiplot as hip
 import numpy as np
 
-st.markdown("<h1 style='text-align: center; font-size: 35px;'>Heart Disease Assessment</h1>", unsafe_allow_html=True)
+import pickle as pkl
+
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+from sklearn.preprocessing import StandardScaler
+from sklearn import neighbors
+from sklearn import svm
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+# Load the Saved Models
+with open("rf_model.pkl", "rb") as file:
+    rf_model = pkl.load(file)
+with open("gnb_model.pkl", "rb") as file:
+    gnb_model = pkl.load(file)
+with open("lr_model.pkl", "rb") as file:
+    lr_model = pkl.load(file)
+with open("svm_model.pkl", "rb") as file:
+    svm_model = pkl.load(file)
+with open("dt_model.pkl", "rb") as file:
+    dt_model = pkl.load(file)
+with open("qda_model.pkl", "rb") as file:
+    qda_model = pkl.load(file)
+with open("knn_model.pkl", "rb") as file:
+    knn_model = pkl.load(file)
+
+
+# Project    
+st.markdown("<h1 style='text-align: center; font-size: 35px;'> Heart Disease Assessment </h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size: 15px;'>Presented by Sandhya Kilari</p>",
     unsafe_allow_html=True
 )
 
-# Load the Dataframe
+# Dataset
 url = "https://raw.githubusercontent.com/SandhyaKilari/Heart-Disease-Assessment/main/heart.csv"
 df_heart = pd.read_csv(url)
-df_heart = df_heart.drop(0)
-#df_heart['sex'] = df_heart.sex.replace({1: "Male", 0: "Female"})
+df_model = df_heart
 
-df_drop = df_heart
-df_drop = df_drop.drop(['slope', 'ca', 'thal'], axis=1)
+# Target Variable
+y = df_heart["target"]
+
+# Data Analysis and Cleaning
+df_heart = df_heart.drop(0)
+df_new = df_heart
+df_new = df_new.drop(['slope', 'ca', 'thal'], axis=1)
+
+# Label Encoding
+data_vis = df_new
+data_vis.columns = ['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholesterol', 'fasting_blood_sugar', 'rest_ecg', 'max_heart_rate_achieved',
+       'exercise_induced_angina', 'st_depression', 'target']
+
 
 # Information about the App
-st.sidebar.subheader("About the Application")
-st.sidebar.info("This web application will enable users to input their health attributes (e.g., age, sex, cholesterol levels, blood pressure, blood sugar level and more) and receive a risk assessment for heart disease. The app will provide a clear prediction that's easy to understand. It will also explain why each detail is important. This tool helps people understand their health and assists doctors when talking to patients.")
-sidebar_placeholder = st.sidebar.empty()
+st.sidebar.write(
+    "Welcome to a journey of self-discovery through your heart's story! 🌟\n\n"
+    "Have you ever wondered what your heart health says about you?"
+)
+image_url = "heart.jpeg" 
+st.sidebar.image(image_url, use_column_width=True)
+st.sidebar.info("This web application unravels the tale hidden within your health attributes (e.g., age, sex, cholesterol levels, blood pressure, blood sugar level and more), offering insights into. The app will provide a clear prediction that's easy to understand. It will also explain why each detail is important. This tool helps people understand their health and assists doctors when talking to patients.")
+st.sidebar.text("") 
+st.sidebar.write("Start uncovering your heart's tale by interacting with various features of the app📈")
 
-def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak):   
+#sidebar_placeholder = st.sidebar.empty()
+
+# Pre-processing of the user-input
+def preprocess(sex, cp, exang,fbs,restecg):   
  
-    # Pre-processing user input   
     if sex=="male":
         sex=1 
-    else: sex=0
-    
+    else: 
+        sex=0
     
     if cp=="Typical angina":
         cp=0
@@ -52,21 +105,7 @@ def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak):
         fbs=1
     elif fbs=="No":
         fbs=0
- 
-    # if slope=="Upsloping: better heart rate with excercise(uncommon)":
-    #     slope=0
-    # elif slope=="Flatsloping: minimal change(typical healthy heart)":
-    #       slope=1
-    # elif slope=="Downsloping: signs of unhealthy heart":
-    #     slope=2  
- 
-    # if thal=="fixed defect: used to be defect but ok now":
-    #     thal=6
-    # elif thal=="reversable defect: no proper blood movement when excercising":
-    #     thal=7
-    # elif thal=="normal":
-    #     thal=2.31
-
+        
     if restecg=="Nothing to note":
         restecg=0
     elif restecg=="ST-T Wave abnormality":
@@ -74,17 +113,12 @@ def preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak):
     elif restecg=="Possible or definite left ventricular hypertrophy":
         restecg=2
 
+    return sex, cp, exang,fbs,restecg
 
-    user_input=[age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak]
-    user_input=np.array(user_input)
-    # user_input=user_input.reshape(1,-1)
-    # user_input=scal.fit_transform(user_input)
-    # prediction = model.predict(user_input)
+# Sections of the Web-Application
+tab1, tab2, tab3, tab4, tab5, tab6, tab7= st.tabs(["Introduction", "Statistical Analysis", "Data Visualization", 'Exploring Relationships', "Classifiers Comparision", "Model Prediction", "Bio"])
 
-    return user_input
-
-tab1, tab2, tab3, tab4, tab5= st.tabs(["Introduction", "Statistical Analysis", "Data Visualization", 'Exploring Relationships', "Model Prediction"])
-
+# Introduction
 with tab1:
     st.markdown("<div style='text-align: justify'>Heart disease is one of the top reasons why people die worldwide, and finding it early is crucial for helping patients get better and reducing the cost of healthcare. By using data science and machine learning, we have a chance to create a tool that can save lives and make people more aware of their health. This project helps individuals, doctors, and society as a whole by giving them a useful way to understand and manage the risk of heart disease.</div>", unsafe_allow_html=True)
     st.markdown(" ")
@@ -93,7 +127,7 @@ with tab1:
     st.markdown("**Dataset**")
     st.markdown("<div style='text-align: justify'>The Cleveland dataset which is widely used in heart disease research comprises 303 instances and 14 attributes, encompassing variables such as age, sex, chest pain type (cp), resting blood pressure (trestbps), serum cholesterol level (chol), fasting blood sugar (fbs), maximum heart rate achieved (thalach), oldpeak, thal, and the target variable indicating presence of heart disease in the patient (0 = no disease, 1 = disease)</div>", unsafe_allow_html=True)
     st.markdown(" ")
-    if st.button("Need to understand the attributes ?"):
+    if st.button("Understand the Attributes/Features present in the dataset"):
         # Display the information when the button is clicked
         st.markdown("1. Age: Represents the age of persons in years")
         st.markdown("2. Sex: (1 = male, 0 = female)")
@@ -111,6 +145,7 @@ with tab1:
     st.markdown("**Reference Link:**")
     st.markdown("https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset")
 
+# Statistical Analysis
 with tab2:
     df=df_heart
     if st.checkbox('Raw Data'):
@@ -122,16 +157,17 @@ with tab2:
         st.write('Information about the data:')
         st.write(f'Total Number of Samples: {df.shape[0]}')
         st.write(f'Number of Features: {df.shape[1]}')
-    if st.checkbox('Correlation Matrix'):
+    if st.checkbox('Correlation Heatmap'):
         st.write('Pairwise correlation of columns, excluding NA/null values')
         st.write(df.corr())
     if st.checkbox('Missing Values'):
         missing_values = df.isnull().sum()
         st.write(missing_values)
 
+# Data Visualization
 with tab3:
-    categorical_columns = ['sex', 'cp', 'fbs', 'restecg', 'exang']
-    df_categorical = df_heart[categorical_columns]
+    categorical_columns = ['sex', 'chest_pain_type', 'fasting_blood_sugar', 'rest_ecg', 'exercise_induced_angina']
+    df_categorical = data_vis[categorical_columns]
     st.markdown('**Which critical risk factors substantially contribute to the occurrence of Heart Disease?**')
 
     if st.checkbox('Distribution of Categorical Variables'):
@@ -139,44 +175,32 @@ with tab3:
         variable = st.selectbox('Please choose preferred variable', categorical_columns)
         distplot = sns.displot(data=df_categorical, x=variable)
         st.pyplot(distplot)
-        if variable == 'age':
-            st.markdown("*The age distribution appears to be slightly positively skewed, with a tail extending to the right. The mode of the distribution is around 50-60 years, indicating that this is the most common age in the dataset. However, there are several outliers on the higher age side, suggesting a few individuals with significantly older ages. The distribution is relatively wide, indicating a fair amount of variability in ages. There is also a secondary, smaller peak around 30-40 years, which could suggest the presence of a younger subgroup in the dataset*")
         if variable == 'sex':
             st.markdown("*The distribution of the 'sex' variable shows that there are two categories: 'female' and 'male.' In this dataset, 'male' is the dominant category, representing a larger proportion of the individuals. This indicates an imbalance in the dataset, with a higher number of males compared to females. The specific proportions of each category would be helpful to understand the exact magnitude of this imbalance*")
-        if variable == 'cp':
+        if variable == 'chest_pain_type':
             st.markdown("*The distribution of the 'cp' variable shows that it comprises several categories corresponding to different types of chest pain. Type 'X' is the most common type of chest pain, representing the largest proportion of individuals in the dataset. This suggests that type 'X' is the dominant category. The other types of chest pain, 'Y,' 'Z,' and 'W,' have smaller proportions, indicating less common occurrences. This distribution provides insights into the prevalence of various chest pain types within the dataset*")        
-        if variable == 'trestbps':
-            st.markdown("*The distribution of 'trestbps' (resting blood pressure) appears to be slightly positively skewed, with a tail extending to the right. The mode of the distribution is around 120 mm Hg, indicating that this is the most common resting blood pressure level in the dataset. However, there are several outliers on the higher blood pressure side, suggesting a few individuals with significantly elevated resting blood pressure. The distribution is relatively wide, which implies a significant variability in resting blood pressure levels within the dataset. This information is crucial for understanding the overall range and characteristics of blood pressure in the context of heart health*")
-        if variable == 'chol':
-            st.markdown("*The distribution of the 'chol' variable appears to be slightly right-skewed, with a tail extending to the higher cholesterol levels. The central tendency of cholesterol levels in this dataset is around the mean value, indicating that this is the typical cholesterol level. There are a few outliers on the higher cholesterol side, suggesting the presence of individuals with significantly elevated cholesterol levels. The distribution is moderately wide, indicating some variability in cholesterol levels. However, it does not appear to have distinct modes or multiple peaks*")
-        if variable == 'fbs':
+        if variable == 'fasting_blood_sugar':
             st.markdown("*The distribution of the 'fbs' variable reveals two categories: 'normal blood sugar' and 'elevated blood sugar.' In this dataset, it appears that 'normal blood sugar' is the dominant category, representing a larger proportion of individuals. This suggests that there are more individuals with normal blood sugar levels in the dataset*")
-        if variable == 'restecg':
+        if variable == 'rest_ecg':
             st.markdown("*The distribution of the 'restecg' variable reveals that it consists of multiple categories, including 'normal,' 'ST-T wave abnormality,' and 'probable or definite left ventricular hypertrophy.' The most common category appears to be 'ST-T wave abnormality,' indicating that this particular electrocardiographic finding is the predominant result in the dataset. It's important to consult the clinical context to understand the significance of this electrocardiographic result, as 'ST-T wave abnormality' may have implications for heart health*")
-        if variable == 'talach':
-            st.markdown("*The distribution of the 'thalach' variable appears to be slightly positively skewed, with a tail extending to the right. The mode of the distribution is around a maximum heart rate of approximately 160 beats per minute, indicating that this is the most common maximum heart rate achieved during exercise in the dataset. The distribution is moderately wide, suggesting some variability in maximum heart rates. There are a few outliers on the higher end, indicating individuals who achieved notably higher maximum heart rates during exercise*")
-        if variable == 'exang':
+        if variable == 'exercise_induced_angina':
             st.markdown("*The distribution of the 'exang' variable indicates two categories: 'no exercise-induced angina' and 'exercise-induced angina.' Without detailed proportions, we can't assess the exact balance or imbalance, but this variable's distribution could be important in the context of a heart disease dataset. If 'exercise-induced angina' is prevalent, it might suggest a significant occurrence of angina during exercise among the individuals in the dataset*")
-        if variable == 'oldpeak':
-            st.markdown("*The distribution of the 'oldpeak' variable appears to be positively skewed, with a tail extending to the right. The peak of the distribution is around 1.5, indicating that this is the most common 'oldpeak' value in the dataset. The distribution is relatively wide, suggesting a notable variability in 'oldpeak' values. There are a few outliers on the higher 'oldpeak' side, which might represent individuals with exceptionally high stress on the heart during exercise*")
-        if variable == 'target':
-            st.markdown("*The distribution of the 'target' variable indicates a binary outcome with two categories: '0' and '1.' In this dataset, it appears that '0' is the dominant category, suggesting a higher proportion of individuals with the absence of the target condition, while '1' represents the presence of the condition. This indicates an imbalance in the dataset, with a larger number of individuals not having the target condition*")
 
     if st.checkbox('Relation between "Target" variable and the features'):
-        df = df_drop.drop('target', axis=1)
+        df = df_new.drop('target', axis=1)
         selected_variable = st.selectbox("Select the desired variable", df.columns)
         data_button = st.selectbox('Please choose preferred visualization', ['Scatter Plot', 'Histogram Plot', 'Distribution Plot'])
 
         if data_button == 'Scatter Plot':
-            scatter_plot = sns.scatterplot(data=df_heart, x=selected_variable, y='target', hue='sex')
+            scatter_plot = sns.scatterplot(data=data_vis, x=selected_variable, y='target', hue='sex')
             st.pyplot(scatter_plot.figure)
 
         elif data_button == 'Histogram Plot':
-            histplot = sns.histplot(data=df_heart, x=selected_variable, y='target', binwidth=5, hue='sex')
+            histplot = sns.histplot(data=data_vis, x=selected_variable, y='target', binwidth=5, hue='sex')
             st.pyplot(histplot.figure)
 
         elif data_button == 'Distribution Plot':
-            distplot = sns.displot(data=df_heart, x=selected_variable, y='target', hue='sex')
+            distplot = sns.displot(data=data_vis, x=selected_variable, y='target', hue='sex')
             st.pyplot(distplot)
 
         if selected_variable == 'age':
@@ -187,30 +211,30 @@ with tab3:
         if selected_variable == 'sex':
             st.write("*From the plot, there is a visible pattern where one gender has a higher concentration of '1' (indicating the presence of heart disease) while the other has a higher concentration of '0' (indicating no heart disease), it suggests that there may be a relationship between gender ('sex') and the likelihood of heart disease*")
         
-        if selected_variable == 'cp':
+        if selected_variable == 'chest_pain_type':
             st.write("*We can see from the plot, certain values of 'cp' are associated with a higher concentration of '1' (indicating the presence of heart disease) and other values of 'cp' are associated with a higher concentration of '0' (indicating no heart disease), it suggests that the 'cp' variable is related to the likelihood of heart disease*")
-
-        if selected_variable == 'trestbps':
+            
+        if selected_variable == 'resting_blood_pressure':
             st.write("*Most data points are concentrated at lower resting blood pressure values for '0' (no heart disease), it suggest a negative correlation, indicating that lower resting blood pressure is associated with a lower likelihood of heart disease*")
 
-        if selected_variable == 'chol':
+        if selected_variable == 'cholesterol':
             st.write("*Most data points are concentrated at lower cholesterol levels for '0' (no heart disease), it might suggest a negative correlation, indicating that lower cholesterol levels are associated with a lower likelihood of heart disease*")        
         
-        if selected_variable == 'fbs':
+        if selected_variable == 'fasting_blood_sugar':
             st.write('*Here data points are divided into two groups based on fasting blood sugar levels (e.g., high and low)*')
             st.write("*Pattern suggest that one group has a higher concentration of '1' (indicating the presence of heart disease) while the other group has a higher concentration of '0' (indicating no heart disease) which implies that high fasting blood sugar levels may be associated with a higher likelihood of heart disease*")
     
-        if selected_variable == 'restecg':
+        if selected_variable == 'rest_ecg':
             st.write('One cluster of data points (representing specific "restecg" values) is predominantly associated with a "target" value of "1" (indicating heart disease presence), while another cluster is primarily associated with a "target" value of "0" (indicating no heart disease), it suggests that "restecg" may be related to the likelihood of heart disease.')
         
-        if selected_variable == 'thalach':
+        if selected_variable == 'max_heart_rate_achieved':
             st.write('*If you see that as heart rate increases, there is a higher concentration of "1" (indicating the presence of heart disease), it suggests a positive correlation. In other words, a higher heart rate might be associated with a higher likelihood of heart disease.*')
             st.write('*Conversely, if you observe that a lower heart rate is associated with a higher concentration of "1", it suggests a negative correlation. In this case, lower heart rate might be related to a higher likelihood of heart disease.*')
 
-        if selected_variable == 'exang':
+        if selected_variable == 'exercise_induced_angina':
             st.write('*Most data points fall into two distinct clusters or patterns, it suggests a possible relationship between exercise-induced angina and the presence of heart disease*')
         
-        if selected_variable == 'oldpeak':
+        if selected_variable == 'st_depression(oldpeak)':
             st.write('*Data points are concentrated at lower "oldpeak" values for a "target" value of 0, it suggests that lower "oldpeak" values are associated with a lower likelihood of heart disease.*')
             	
     # HiPlot Visualization
@@ -219,11 +243,10 @@ with tab3:
         exp.to_html(output_file)
         return output_file
         
-    if st.checkbox('Heart Disease Dataset Visualization with HiPlot'):
-        df_heart = df_drop
+    if st.checkbox('Interactive HiPlot Visualization'):
         st.write('*This plot allows user to select required columns and visualize them using HiPlot. By systematically exploring the dataset, we can uncover relationships into how attributes may be correlated with the presence or absence of heart disease within specific age groups and clinical attribute ranges.*')
-        selected_columns = st.multiselect("Select columns to visualize", df_heart.columns)
-        selected_data = df_heart[selected_columns]
+        selected_columns = st.multiselect("Select columns to visualize", data_vis.columns)
+        selected_data = data_vis[selected_columns]
         if not selected_data.empty:
             experiment = hip.Experiment.from_dataframe(selected_data)
             hiplot_html_file = save_hiplot_to_html(experiment)
@@ -232,9 +255,8 @@ with tab3:
             st.write("No data selected. Please choose at least one column to visualize.")
     
     if st.checkbox("Visualization Techniques"):
-        df_heart=df_drop
         st.subheader('Correlation Heatmap')
-        correlation_matrix = df_heart.corr()
+        correlation_matrix = data_vis.corr()
         plt.figure(figsize=(10, 8))
         heatmap = sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
         st.pyplot(heatmap.figure)
@@ -242,23 +264,25 @@ with tab3:
 
         st.subheader("Pairplot")
         sns.set(style="ticks")
-        pairplot = sns.pairplot(df_heart, hue="target", diag_kind="kde", markers=["o", "s"])
+        pairplot = sns.pairplot(data_vis, hue="target", diag_kind="kde", markers=["o", "s"])
         st.pyplot(pairplot.figure)
         plt.clf()  # Clear the figure
         st.markdown("*The pair plot will show scatter plots for all pairs of numerical variables in the dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
 
+# Exploring Relationships
 with tab4:
     # Correlation based analysis
-    correlation = df_heart['cp'].corr(df_heart['target'])
+    df_heart = data_vis
+    correlation = df_heart['chest_pain_type'].corr(df_heart['target'])
     st.subheader(f'Chest Pain Types vs. Heart Disease\nCorrelation: {correlation:.2f}')
     plt.figure(figsize=(12, 6))  # Adjusted for two side-by-side boxplots
-    cp_0 = df_heart[df_heart['cp'] == 0]
-    cp_1 = df_heart[df_heart['cp'] != 0]
+    cp_0 = df_heart[df_heart['chest_pain_type'] == 0]
+    cp_1 = df_heart[df_heart['chest_pain_type'] != 0]
     plt.subplot(1, 2, 1)
-    plot1 = sns.boxplot(data=cp_0, x='cp', y='target', color='blue')
+    plot1 = sns.boxplot(data=cp_0, x='chest_pain_type', y='target', color='blue')
     plt.title('Chest Pain Type 0')
     plt.subplot(1, 2, 2)
-    plot2 = sns.boxplot(data=cp_1, x='cp', y='target', color='green')
+    plot2 = sns.boxplot(data=cp_1, x='chest_pain_type', y='target', color='green')
     plt.title('Chest Pain Type 1-3')
     st.pyplot(plot1.figure, plot2.figure)
     plt.clf()  # Clear the figure
@@ -266,43 +290,216 @@ with tab4:
     st.write("*The box plot helps us to understand how chest pain types are related to the presence of heart disease. For example, we can observe whether a particular chest pain type is more common in individuals with or without heart disease based on the median and the distribution of data points.*")
     
     # Feature Relationship
-    correlation = df_heart['age'].corr(df_heart['trestbps'])
+    correlation = df_heart['age'].corr(df_heart['resting_blood_pressure'])
     st.subheader(f'Age vs. Blood Pressure\nCorrelation: {correlation:.2f}')
     plt.figure(figsize=(10, 10))  # Set a larger figure size
-    plot2 = sns.scatterplot(data=df_heart, x='age', y='trestbps', color='green', label= "age vs trestbps")
+    plot2 = sns.scatterplot(data=df_heart, x='age', y='resting_blood_pressure', color='green', label= "age vs resting_blood_pressure")
     st.pyplot(plot2.figure)
     plt.clf()  # Clear the figure
     st.write("*Age and blood pressure are positively correlated, meaning that as people get older, their blood pressure tends to increase, which can be a risk factor for heart disease*")
 
-    correlation = df_heart['thalach'].corr(df_heart['target'])
+    correlation = df_heart['max_heart_rate_achieved'].corr(df_heart['target'])
     st.subheader(f'Heart Rate vs. Heart Disease\nCorrelation: {correlation:.2f}')
     plt.figure(figsize=(8, 6))  # Set a larger figure size
-    plot3 = sns.scatterplot(data=df_heart, x='thalach', y='target', color='red', alpha=0.5, label= "thalach vs target")
+    plot3 = sns.scatterplot(data=df_heart, x='max_heart_rate_achieved', y='target', color='red', alpha=0.5, label= "max_heart_rate_achieved vs target")
     st.pyplot(plot3.figure)
     plt.clf()  # Clear the figure
     st.write("*The scatter plot show that individuals with higher heart rate tend to be more likelihood of heart disease, as the points cluster in the direction of increasing rate and heart disease presence*")
 
 with tab5:
+    data = df_model.drop(['slope', 'ca', 'thal'], axis=1)
+    X = data.drop('target', axis=1) 
+    y = data['target']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        
+    st.write("Model Performance Metrices")
+        
+    algorithms = [
+        "Support Vector Machine",
+        "Logistic Regression",
+        "Naive Bayes",
+        "K-Nearest Neighbors",
+        "Quadratic Discriminant Analysis",
+        "Decision Tree",
+        "Random Forest"
+    ]
+    
+    model = st.selectbox("Select a Model", algorithms)
+    if model == "Support Vector Machine":
+        C = st.slider("C (Regularization parameter)", 0.1, 10.0, step=0.1, value=1.0)
+        gamma = st.slider("Gamma", 0.1, 10.0, step=0.1, value=1.0)
+        
+        svm_model = svm.SVC(C=C, gamma=gamma)
+        svm_model.fit(X_train, y_train)
+        
+        y_pred = svm_model.predict(X_test)
+        conf_mat = confusion_matrix(y_test, y_pred)
+        
+        st.write("Confusion matrix:\n", conf_mat)
+        st.write("Accuracy:", svm_model.score(X_test, y_test))
+        st.write("Precision:", metrics.precision_score(y_test, y_pred))
+        st.write("F1:", metrics.f1_score(y_test, y_pred))
+       
+    if model == "Logistic Regression":
+        C = st.slider("C (Regularization parameter)", 0.1, 10.0, step=0.1, value=1.0)
+        random_state = st.number_input("Random State", min_value=0, max_value=1000, value=0, step=1, format="%d")
+        lr_model = LogisticRegression(C=C, random_state=random_state)
+        lr_model.fit(X_train, y_train)
+        y_pred = lr_model.predict(X_test)
+        cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        st.write("Confusion matrix:\n", cnf_matrix)
+        st.write("Accuracy:", lr_model.score(X_test, y_test))
+        st.write("Precision:",metrics.precision_score(y_test, y_pred))
+        st.write("F1:",metrics.f1_score(y_test, y_pred)) 
+                          
+            
+    if model == "Naive Bayes":
+        selected_features = st.multiselect("Select Features", list(X_train.columns))
+        if not selected_features:
+            st.warning("Please select at least one feature.")
+        else:
+            X_train_selected = X_train[selected_features]
+            X_test_selected = X_test[selected_features]
+            
+            gnb_model = GaussianNB()
+            gnb_model.fit(X_train_selected, y_train)
+            y_pred = gnb_model.predict(X_test_selected)
+            cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+            st.write("Confusion matrix:\n", cnf_matrix)
+            st.write("Accuracy:", gnb_model.score(X_test_selected, y_test))
+            st.write("Precision:", metrics.precision_score(y_test, y_pred))
+            st.write("F1:", metrics.f1_score(y_test, y_pred))
+                        
+    if model == "K-Nearest Neighbors":
+        n_neighbors = st.slider("Number of Neighbors (n_neighbors)", 1, 20, value=5)
+        knn_model = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors)        
+        knn_model.fit(X_train, y_train)
+        y_pred = knn_model.predict(X_test)
+        cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        st.write("Confusion matrix:\n", cnf_matrix)
+        st.write("Accuracy:", knn_model.score(X_test, y_test)) 
+        st.write("Precision:",metrics.precision_score(y_test, y_pred))
+        st.write("F1:",metrics.f1_score(y_test, y_pred)) 
+                        
+    if model == "Quadratic Discriminant Analysis":
+        reg_param = st.slider("Regularization Parameter (reg_param)", 0.0, 1.0, value=0.0)
+        qda_model = QuadraticDiscriminantAnalysis(reg_param=reg_param)
+        qda_model.fit(X_train, y_train)
+        y_pred = qda_model.predict(X_test)
+        cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        st.write("Confusion matrix:\n", cnf_matrix)
+        st.write("Accuracy:", qda_model.score(X_test, y_test))
+        st.write("Precision:",metrics.precision_score(y_test, y_pred))
+        st.write("F1:",metrics.f1_score(y_test, y_pred)) 
+                        
+    if model == "Decision Tree":
+        criterion = st.selectbox("Criterion", ["gini", "entropy"])
+        random_state = st.number_input("Random State", min_value=0, max_value=100, value=0, step=1, format="%d")
+        max_depth = st.slider("Maximum Depth", 1, 20, value=5)
+        dt_model = DecisionTreeClassifier(criterion=criterion, random_state=random_state, max_depth=max_depth)
+        dt_model.fit(X_train, y_train)
+        y_pred = dt_model.predict(X_test)
+        cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        st.write("Confusion matrix:\n", cnf_matrix)
+        st.write("Accuracy:", dt_model.score(X_test, y_test))
+        st.write("Precision:",metrics.precision_score(y_test, y_pred))
+        st.write("F1:",metrics.f1_score(y_test, y_pred)) 
+                        
+                        
+    if model == "Random Forest":
+        n_estimators = st.slider("Number of Estimators", 1, 100, value=2, step=1)
+        random_state = st.number_input("Random State", min_value=0, max_value=100, value=0, step=1, format="%d")
+        rf_model = RandomForestClassifier(n_estimators=n_estimators, random_state=random_state)
+        rf_model.fit(X_train, y_train)
+        y_pred = rf_model.predict(X_test)
+        cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+        st.write("Confusion matrix:\n", cnf_matrix)
+        st.write("Accuracy:", rf_model.score(X_test, y_test))
+        st.write("Precision:",metrics.precision_score(y_test, y_pred))
+        st.write("F1:",metrics.f1_score(y_test, y_pred)) 
+                         
+        
+    if st.button("Summarization and visualization of accuracy scores for different machine learning algorithms"):
+        accuracy = []
+        classifiers = ['Support Vector Machine','KNN', 'Decision Tree', 'Logistic Regression', 'Naive Bayes', 'Quadratic Discriminant Analysis', 'Random Forest']
+        models = [svm.SVC(gamma=0.001),neighbors.KNeighborsClassifier(n_neighbors=2), DecisionTreeClassifier(criterion='gini', random_state=0), LogisticRegression(), GaussianNB(), QuadraticDiscriminantAnalysis(), RandomForestClassifier(n_estimators=8, random_state=0)]
+        summary = pd.DataFrame(columns=['accuracy'], index=classifiers)
+        for model, clf_name in zip(models, classifiers):
+            model.fit(X_train, y_train)
+            score = model.score(X_test, y_test)
+            accuracy.append(score)
+            summary.loc[clf_name] = score
+        
+        st.write(summary)
+        st.write(" ")
+        scores = [accuracy[0], accuracy[3], accuracy[4], accuracy[1], accuracy[5], accuracy[2], accuracy[6]]
+        algorithms = ["Support Vector Machine","Logistic Regression","Naive Bayes","K-Nearest Neighbors","Quadratic Discriminant Analysis","Decision Tree","Random Forest"]
+        sns.set(rc={'figure.figsize': (15, 8)})
+        fig, ax = plt.subplots()
+        ax.set_xlabel("Algorithms")
+        ax.set_ylabel("Accuracy score")
+        sns.barplot(x=algorithms, y=scores, ax=ax)
+        ax.set_xticklabels(algorithms, rotation=45)
+        plt.tight_layout()
+        st.pyplot(fig)
+        
+        st.write('*The provided code creates a bar plot using Seaborn to visualize the accuracy scores of different machine learning algorithms. It uses the scores list containing accuracy values and algorithms list with algorithm names to plot a bar graph with algorithm names on the x-axis and accuracy scores on the y-axis. This visualization helps compare the performance of various algorithms in terms of accuracy.*')
+        st.write(" ")
+        st.write("Among the model trained and tested, RandomForestClassifier has overall the best accuracy")
+
+### User Input for Predictions
+def user_input_features():
+    age = st.number_input('Age of persons (29 - 77): ')
+    sex = st.radio("Select Gender: ", ('male', 'female'))
+    cp = st.selectbox('Chest Pain Type',("Typical angina","Atypical angina","Non-anginal pain","Asymptomatic")) 
+    trtbps = st.number_input('Resting blood pressure (94 - 200): ')
+    chol = st.number_input('Serum cholestrol in mg/dl (126 - 564): ')
+    fbs = st.radio("Fasting Blood Sugar higher than 120 mg/dl", ['Yes','No'])
+    restecg=st.selectbox('Resting Electrocardiographic Results',("Nothing to note","ST-T Wave abnormality","Possible or definite left ventricular hypertrophy"))
+    thalachh = st.number_input('Maximum heart rate achieved thalach (71 - 202): ')
+    exang=st.selectbox('Exercise Induced Angina',["Yes","No"])
+    oldpeak = st.number_input(' ST depression induced by exercise relative to rest (oldpeak) (0 - 6.2): ')
+
+    sex, cp, exang, fbs, restecg = preprocess(sex, cp, exang,fbs,restecg)
+
+    data= {'age':age, 'sex':sex, 'cp':cp, 'trestbps':trtbps, 'chol':chol, 'fbs':fbs, 'restecg':restecg, 'thalach':thalachh,
+       'exang':exang, 'oldpeak':oldpeak
+                }
+    features = pd.DataFrame(data, index=[0])
+    return features
+
+with tab6:
+    data = df_model.drop(['slope', 'ca', 'thal'], axis=1)
+    X_test = data.drop('target', axis=1) 
+    y_test = data['target']
+    
+    def predict(data):
+        return rf_model.predict(data)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
     st.markdown("Can we establish a dependable predictive tool for early detection?")
     st.write(" ")
     st.write("Enter the Required fields to check whether you have a healthy heart")
-    age = st.selectbox("Age", range(1, 121, 1))
-    sex = st.radio("Select Gender: ", ('male', 'female'))
-    cp = st.selectbox('Chest Pain Type', ("Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"))
-    trestbps = st.selectbox('Resting Blood Pressure (in mm Hg)', range(1, 500, 1))
-    chol = st.selectbox('Serum Cholestoral (in mg/dl)', range(1, 1000, 1))
-    restecg = st.selectbox('Resting Electrocardiographic Results', ("Nothing to note", "ST-T Wave abnormality", "Possible or definite left ventricular hypertrophy"))
-    fbs = st.radio("Fasting Blood Sugar (> 120 mg/dl)", ['Yes', 'No'])
-    thalach = st.selectbox('Maximum Heart Rate Achieved', range(1, 300, 1))
-    exang = st.selectbox('Exercise Induced Angina', ["Yes", "No"])
-    oldpeak = st.number_input('Oldpeak (ST depression induced by exercise relative to rest)')
-    # slope = st.selectbox('Heart Rate Slope', ("Upsloping: better heart rate with exercise (uncommon)", "Flatsloping: minimal change (typical healthy heart)", "Downsloping: signs of an unhealthy heart"))
-    # ca = st.selectbox('Number of Major Vessels (0-3) Colored by Fluoroscopy', range(0, 5, 1))
-    # thal = st.selectbox('Thalium Stress Result', range(1, 8, 1))
+    input_df = user_input_features()    
     
-
-    pred=preprocess(age,sex,cp,trestbps,restecg,chol,fbs,thalach,exang,oldpeak)
-
     if st.button("Estimate"):
-        st.write(pred)
-        st.write("Need to create a model based on the attributes to predict the risk of getting a heart disease!!")
+        # rf_model = RandomForestClassifier(n_estimators=2)
+        result = predict(input_df)
+        accuracy = rf_model.score(X_test, y_test)
+                
+        if (result[0]== 0):
+            st.subheader('The Person :green[does not have a Heart Disease]')
+        else:
+            st.subheader('The Person :red[has Heart Disease]')
+    
+        st.write(f"Model Accuracy: {accuracy*100:.2f}%")
+        
+with tab7:
+    st.write("Hi there! I am Sandhya Kilari, currently pursuing Master's in Data Science. I'm an avid data scientist, passionate about extracting insights from data using various analytical tools and techniques. My expertise includes machine learning, statistical analysis, and data visualization.")
+    st.write(" ")
+    st.write("Thriving on challenges, I engage in impactful endeavors that matter. When I'm not diving into data, I love spending time in nature, capturing moments through photography, and honing my culinary skills by experimenting with different cuisines.")
+    st.write(" ")
+    st.write("I'm excited to be a part of this project because it aligns perfectly with my passion for leveraging data to create meaningful solutions. I believe that by applying data science principles, we can solve real-world problems and make a positive difference.")
+    st.write(" ")
+    st.write("Feel free to reach out if you have any questions or just want to discuss data science, philosophy, or anything else that piques your curiosity!")
+    
