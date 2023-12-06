@@ -5,7 +5,7 @@ matplotlib
 altair
 hiplot
 numpy
-sklearn
+scikit-learn
 sklearn.metrics
 sklearn.model_selection
 sklearn.preprocessing
