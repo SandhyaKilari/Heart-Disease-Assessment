@@ -175,6 +175,7 @@ with tab3:
         variable = st.selectbox('Please choose preferred variable', categorical_columns)
         distplot = sns.displot(data=df_categorical, x=variable)
         st.pyplot(distplot)
+        plt.clf()
         if variable == 'sex':
             st.markdown("*The distribution of the 'sex' variable shows that there are two categories: 'female' and 'male.' In this dataset, 'male' is the dominant category, representing a larger proportion of the individuals. This indicates an imbalance in the dataset, with a higher number of males compared to females. The specific proportions of each category would be helpful to understand the exact magnitude of this imbalance*")
         if variable == 'chest_pain_type':
@@ -194,7 +195,7 @@ with tab3:
         if data_button == 'Scatter Plot':
             scatter_plot = sns.scatterplot(data=data_vis, x=selected_variable, y='target', hue='sex')
             st.pyplot(scatter_plot.figure)
-
+            
         elif data_button == 'Box Plot':
             box_plot = sns.boxplot(x='target', y=selected_variable, data=data_vis,palette='rainbow')
             st.pyplot(box_plot.figure)
