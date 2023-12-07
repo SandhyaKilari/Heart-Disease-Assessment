@@ -454,15 +454,15 @@ with tab5:
 
 ### User Input for Predictions
 def user_input_features():
-    age = st.number_input('Age of persons (29 - 77): ')
+    age = st.number_input('Age of persons (29 - 77): ', min_value=29, max_value=77, value=29, step=1)
     sex = st.radio("Select Gender: ", ('male', 'female'))
-    cp = st.selectbox('Chest Pain Type',("Typical angina","Atypical angina","Non-anginal pain","Asymptomatic")) 
-    trtbps = st.number_input('Resting blood pressure (94 - 200): ')
-    chol = st.number_input('Serum cholestrol in mg/dl (126 - 564): ')
-    fbs = st.radio("Fasting Blood Sugar higher than 120 mg/dl", ['Yes','No'])
-    restecg=st.selectbox('Resting Electrocardiographic Results',("Nothing to note","ST-T Wave abnormality","Possible or definite left ventricular hypertrophy"))
-    thalachh = st.number_input('Maximum heart rate achieved thalach (71 - 202): ')
-    exang=st.selectbox('Exercise Induced Angina',["Yes","No"])
+    cp = st.selectbox('Chest Pain Type', ("Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"))
+    trtbps = st.number_input('Resting blood pressure (94 - 200): ', min_value=94, max_value=200, value=94, step=1)
+    chol = st.number_input('Serum cholestrol in mg/dl (126 - 564): ', min_value=126, max_value=564, value=126, step=1)
+    fbs = st.radio("Fasting Blood Sugar higher than 120 mg/dl", ['Yes', 'No'])
+    restecg = st.selectbox('Resting Electrocardiographic Results', ("Nothing to note", "ST-T Wave abnormality", "Possible or definite left ventricular hypertrophy"))
+    thalachh = st.number_input('Maximum heart rate achieved thalach (71 - 202): ', min_value=71, max_value=202, value=71, step=1)
+    exang = st.selectbox('Exercise Induced Angina', ["Yes", "No"])
     oldpeak = st.number_input(' ST depression induced by exercise relative to rest (oldpeak) (0 - 6.2): ')
 
     sex, cp, exang, fbs, restecg = preprocess(sex, cp, exang,fbs,restecg)
