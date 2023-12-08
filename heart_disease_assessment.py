@@ -457,7 +457,6 @@ with tab5:
         ax.set_xlabel("Algorithms")
         ax.set_ylabel("Accuracy score")
         sns.barplot(x=algorithms, y=scores, ax=ax)
-        ax.set_xticklabels(algorithms, rotation=45)
         plt.tight_layout()
         st.pyplot(fig)
         
