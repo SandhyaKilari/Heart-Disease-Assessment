@@ -344,7 +344,9 @@ with tab5:
         st.write("Accuracy:", svm_model.score(X_test, y_test))
         st.write("Precision:", metrics.precision_score(y_test, y_pred))
         st.write("F1:", metrics.f1_score(y_test, y_pred))
-       
+        with st.expander("Understand what Support Vector Machine is and how it works"):
+            st.write("The Support Vector Machine (SVM) is a type of supervised machine learning algorithm used for classification and regression tasks. It targets to finds the best possible way to divide data points into different categories by drawing a line, plane, or hyperplane in a higher-dimensional space, maximizing the margin between the different categories while allowing for some errors.  It's widely used in various fields like image classification, text classification, biological classification problems, and more.")
+        
     if model == "Logistic Regression":
         C = st.slider("C (Regularization parameter)", 0.1, 10.0, step=0.1, value=1.0)
         random_state = st.number_input("Random State", min_value=0, max_value=1000, value=0, step=1, format="%d")
@@ -356,7 +358,8 @@ with tab5:
         st.write("Accuracy:", lr_model.score(X_test, y_test))
         st.write("Precision:",metrics.precision_score(y_test, y_pred))
         st.write("F1:",metrics.f1_score(y_test, y_pred)) 
-                          
+        with st.expander("Understand what Logistic Regression is and how it works"):
+            st.write("Logistic Regression is a statistical technique used for binary classification. It estimates the probability of an observation belonging to one of two classes. It uses a sigmoid function to transform input features into probabilities and draws a decision boundary to separate classes. The model learns from labeled data, assigns importance to features, and is evaluated based on its predictive performance using metrics like accuracy, precision, recall, and F1-score.")                                                    
             
     if model == "Naive Bayes":
         selected_features = st.multiselect("Select Features", list(X_train.columns))
@@ -374,7 +377,9 @@ with tab5:
             st.write("Accuracy:", gnb_model.score(X_test_selected, y_test))
             st.write("Precision:", metrics.precision_score(y_test, y_pred))
             st.write("F1:", metrics.f1_score(y_test, y_pred))
-                        
+        with st.expander("Understand what Gaussian Naive Bayes is and how it works"):
+            st.write("Gaussian Naive Bayes is a classification algorithm based on Bayes' theorem. It assumes features are normally distributed and independent. It calculates the probability that a data point belongs to a particular class using Gaussian (normal) distributions for numeric features. This method is commonly used in text classification, medical diagnosis, and similar tasks where feature independence and Gaussian distribution hold. Despite its simplicity, it's often effective and computationally efficient, especially with smaller datasets.")       
+                              
     if model == "K-Nearest Neighbors":
         n_neighbors = st.slider("Number of Neighbors (n_neighbors)", 1, 20, value=5)
         knn_model = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors)        
@@ -385,7 +390,9 @@ with tab5:
         st.write("Accuracy:", knn_model.score(X_test, y_test)) 
         st.write("Precision:",metrics.precision_score(y_test, y_pred))
         st.write("F1:",metrics.f1_score(y_test, y_pred)) 
-                        
+        with st.expander("Understand what K-Nearest Neighbors is and how it works"):
+            st.write("K-Nearest Neighbors (KNN) is a machine learning algorithm used for classification and regression. It predicts the class or value of a new data point by considering the majority (for classification) or averaging (for regression) the 'K' nearest data points in the training set based on a chosen distance measure, typically Euclidean distance. Its simplicity makes it easy to understand, but it can be computationally intensive for large datasets during the prediction phase. The choice of 'K' influences the model's performance.")
+                             
     if model == "Quadratic Discriminant Analysis":
         reg_param = st.slider("Regularization Parameter (reg_param)", 0.0, 1.0, value=0.0)
         qda_model = QuadraticDiscriminantAnalysis(reg_param=reg_param)
@@ -396,7 +403,9 @@ with tab5:
         st.write("Accuracy:", qda_model.score(X_test, y_test))
         st.write("Precision:",metrics.precision_score(y_test, y_pred))
         st.write("F1:",metrics.f1_score(y_test, y_pred)) 
-                        
+        with st.expander("Understand what Quadratic Discriminant Analysis is and how it works"):
+            st.write("Quadratic Discriminant Analysis (QDA) is a classification technique used for predicting categories based on input features. It calculates distinct mean vectors and covariance matrices for each class from the training data. These parameters are used to create a model that predicts the class to which new observations belong. QDA's flexibility in allowing separate covariance matrices for each class enables it to handle non-linear relationships between features and classes, making it useful for scenarios with complex or non-linear data patterns.")
+                              
     if model == "Decision Tree":
         criterion = st.selectbox("Criterion", ["gini", "entropy"])
         random_state = st.number_input("Random State", min_value=0, max_value=100, value=0, step=1, format="%d")
@@ -409,7 +418,10 @@ with tab5:
         st.write("Accuracy:", dt_model.score(X_test, y_test))
         st.write("Precision:",metrics.precision_score(y_test, y_pred))
         st.write("F1:",metrics.f1_score(y_test, y_pred)) 
-                        
+        with st.expander("Understand what Decision Tree is and how it works"):      
+            st.write("Decision tree modeling is a machine learning technique that creates a tree-like structure to make decisions based on input data. It selects features to split the data into subsets, aiming to make the subsets as homogeneous as possible regarding the target variable. This process continues recursively until a stopping criterion is met. When new data is given, the model traverses the tree to predict the outcome based on the input features. Advantages include interpretability and the ability to capture non-linear relationships.")
+            st.write(" ")
+            st.write("However, decision trees can also suffer from certain limitations like overfitting (creating overly complex trees that perform well on training data but poorly on unseen data), instability with small variations in data, and sometimes not achieving the highest predictive accuracy compared to other algorithms.")                                    
                         
     if model == "Random Forest":
         n_estimators = st.slider("Number of Estimators", 1, 100, value=2, step=1)
@@ -422,9 +434,10 @@ with tab5:
         st.write("Accuracy:", rf_model.score(X_test, y_test))
         st.write("Precision:",metrics.precision_score(y_test, y_pred))
         st.write("F1:",metrics.f1_score(y_test, y_pred)) 
-                         
+        with st.expander("Understand what Random Forest is and how it works"):
+            st.write("Random Forest is a powerful machine learning technique that builds numerous decision trees using random subsets of data and features. These individual trees work together by voting (for classification problems) or averaging (for regression tasks) to produce predictions. It's highly effective, particularly with large datasets, as it mitigates overfitting issues commonly found in single decision trees. Due to its ability to create diverse models and combine their outputs, Random Forest is known for its accuracy and robustness across different applications in machine learning.")                          
         
-    if st.button("Summarization and visualization of accuracy scores for different machine learning algorithms"):
+    with st.expander("Summarization and visualization of accuracy scores for different machine learning algorithms"):
         accuracy = []
         classifiers = ['Support Vector Machine','KNN', 'Decision Tree', 'Logistic Regression', 'Naive Bayes', 'Quadratic Discriminant Analysis', 'Random Forest']
         models = [svm.SVC(gamma=0.001),neighbors.KNeighborsClassifier(n_neighbors=2), DecisionTreeClassifier(criterion='gini', random_state=0), LogisticRegression(), GaussianNB(), QuadraticDiscriminantAnalysis(), RandomForestClassifier(n_estimators=8, random_state=0)]
