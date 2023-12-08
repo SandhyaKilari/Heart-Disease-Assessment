@@ -173,8 +173,8 @@ with tab3:
     if st.checkbox('Distribution of Categorical Variables'):
         st.markdown("Explore distribution of categorical variables that contributes to the presence or absence of heart disease")
         variable = st.selectbox('Please choose preferred variable', categorical_columns)
-        distplot = sns.displot(data=df_categorical, x=variable)
-        st.pyplot(distplot)
+        countplot = sns.countplot(x=variable,hue='target', data=data_vis)
+        st.pyplot(countplot.figure)
         plt.clf()
         if variable == 'sex':
             st.markdown("*The distribution of the 'sex' variable shows that there are two categories: 'female' and 'male.' In this dataset, 'male' is the dominant category, representing a larger proportion of the individuals. This indicates an imbalance in the dataset, with a higher number of males compared to females. The specific proportions of each category would be helpful to understand the exact magnitude of this imbalance*")
