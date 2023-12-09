@@ -6,3 +6,4 @@ altair
 hiplot
 numpy
 scikit-learn
+plotly
