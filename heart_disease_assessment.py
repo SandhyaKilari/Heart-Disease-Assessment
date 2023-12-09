@@ -482,6 +482,7 @@ with tab5:
         fig, ax = plt.subplots()
         ax.set_xlabel("Algorithms")
         ax.set_ylabel("Accuracy score")
+        ax.set_title("Accuracy scores of different machine learning algorithms")
         sns.barplot(x=algorithms, y=scores, ax=ax)
         plt.tight_layout()
         st.pyplot(fig)
