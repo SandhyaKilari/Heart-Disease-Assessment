@@ -10,6 +10,7 @@ import plotly.express as px
 
 import pickle as pkl
 
+# Sklearn Libraries
 from sklearn import metrics
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 from sklearn.model_selection import train_test_split
@@ -127,11 +128,11 @@ with tab1:
     st.markdown("**Dataset**")
     st.markdown("<div style='text-align: justify'>The Cleveland dataset which is widely used in heart disease research comprises 303 instances and 14 attributes, encompassing variables such as age, sex, chest pain type (cp), resting blood pressure (trestbps), serum cholesterol level (chol), fasting blood sugar (fbs), maximum heart rate achieved (thalach), oldpeak, thal, and the target variable indicating presence of heart disease in the patient (0 = no disease, 1 = disease)</div>", unsafe_allow_html=True)
     st.markdown(" ")
+    
     if st.button("Understand the Attributes/Features present in the dataset"):
-        # Display the information when the button is clicked
         st.markdown("1. Age: Represents the age of persons in years")
         st.markdown("2. Sex: (1 = male, 0 = female)")
-        st.markdown('3. Chest Pain Type (cp): [ 0: asymptomatic, 1: atypical angina, 2: non-anginal pain, 3: typical angina]')
+        st.markdown('3. Chest Pain Type (cp): [0: typical angina, 1: atypical angina, 2: Non-anginal pain,  3: asymptomatic]')
         st.markdown("4. Resting Blood Pressure (trestbps) in mm Hg")
         st.markdown("5. Serum Cholesterol (chol) in mg/dL")
         st.markdown("6. Fasting Blood Sugar (fbs) > 120 mg/dL: [0 = no, 1 = yes]")
@@ -142,6 +143,7 @@ with tab1:
         st.markdown("11. Slope of the peak exercise ST segment (slope): [0: downsloping; 1: flat; 2: upsloping]")
         st.markdown("12. Number of Major Vessels Colored by Fluoroscopy (ca): 0-3")
         st.markdown("13. Thalium Stress Result (thal): (0 = normal; 1 = fixed defect; 2 = reversable defect)")
+        
     st.markdown("**Reference Link:**")
     st.markdown("https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset")
 
@@ -161,6 +163,8 @@ with tab2:
     if st.checkbox('Missing Values'):
         missing_values = df.isnull().sum()
         st.write(missing_values)
+        st.write("")
+        st.write("**No Missing values present in the dataset**")        
 
 # Data Visualization
 with tab3:
@@ -175,15 +179,15 @@ with tab3:
         st.pyplot(countplot.figure)
         plt.clf()
         if variable == 'sex':
-            st.markdown("*The distribution of the 'sex' variable shows that there are two categories: 'female' and 'male.' In this dataset, 'male' is the dominant category, representing a larger proportion of the individuals. This indicates an imbalance in the dataset, with a higher number of males compared to females. The specific proportions of each category would be helpful to understand the exact magnitude of this imbalance*")
+            st.markdown("*The distribution of the 'sex' variable shows that there are two categories: 'female' and 'male.' In this dataset, '1-male' is the dominant category, representing a larger proportion of the individuals. This indicates an imbalance in the dataset, with a higher number of males compared to females. The specific proportions of each category would be helpful to understand the exact magnitude of this imbalance*")
         if variable == 'chest_pain_type':
-            st.markdown("*The distribution of the 'cp' variable shows that it comprises several categories corresponding to different types of chest pain. Type 'X' is the most common type of chest pain, representing the largest proportion of individuals in the dataset. This suggests that type 'X' is the dominant category. The other types of chest pain, 'Y,' 'Z,' and 'W,' have smaller proportions, indicating less common occurrences. This distribution provides insights into the prevalence of various chest pain types within the dataset*")        
+            st.markdown("*The distribution of the 'chest-pain' variable shows that it comprises several categories corresponding to different types of chest pain. Type '0-typical angina' is the most common type of chest pain, representing the largest proportion of individuals in the dataset. This suggests that type '0-typical angina' is the dominant category. The other types of chest pain, '1-atypical angina,' '2-Non-anginal pain,' '3-asymptomatic' have smaller proportions, indicating less common occurrences. This distribution provides insights into the prevalence of various chest pain types within the dataset*")        
         if variable == 'fasting_blood_sugar':
-            st.markdown("*The distribution of the 'fbs' variable reveals two categories: 'normal blood sugar' and 'elevated blood sugar.' In this dataset, it appears that 'normal blood sugar' is the dominant category, representing a larger proportion of individuals. This suggests that there are more individuals with normal blood sugar levels in the dataset*")
+            st.markdown("*The distribution of the 'fasting_blood_sugar' variable reveals two categories: 'normal blood sugar' and 'elevated blood sugar.' In this dataset, it appears that '0-normal blood sugar' is the dominant category, representing a larger proportion of individuals. This suggests that there are more individuals with normal blood sugar levels in the dataset*")
         if variable == 'rest_ecg':
-            st.markdown("*The distribution of the 'restecg' variable reveals that it consists of multiple categories, including 'normal,' 'ST-T wave abnormality,' and 'probable or definite left ventricular hypertrophy.' The most common category appears to be 'ST-T wave abnormality,' indicating that this particular electrocardiographic finding is the predominant result in the dataset. It's important to consult the clinical context to understand the significance of this electrocardiographic result, as 'ST-T wave abnormality' may have implications for heart health*")
+            st.markdown("*The distribution of the 'rest_ecg' variable reveals that it consists of multiple categories, including '0-normal,' '1-ST-T wave abnormality,' and '2-probable or definite left ventricular hypertrophy.' The most common category appears to be '1-ST-T wave abnormality,' indicating that this particular electrocardiographic finding is the predominant result in the dataset. It's important to consult the clinical context to understand the significance of this electrocardiographic result, as '1-ST-T wave abnormality' may have implications for heart health*")
         if variable == 'exercise_induced_angina':
-            st.markdown("*The distribution of the 'exang' variable indicates two categories: 'no exercise-induced angina' and 'exercise-induced angina.' Without detailed proportions, we can't assess the exact balance or imbalance, but this variable's distribution could be important in the context of a heart disease dataset. If 'exercise-induced angina' is prevalent, it might suggest a significant occurrence of angina during exercise among the individuals in the dataset*")
+            st.markdown("*The distribution of the 'exercise_induced_angina' variable indicates two categories: 'no exercise-induced angina' and 'exercise-induced angina.' Without detailed proportions, we can't assess the exact balance or imbalance, but this variable's distribution could be important in the context of a heart disease dataset. If 'exercise-induced angina' is prevalent, it might suggest a significant occurrence of angina during exercise among the individuals in the dataset*")
 
     if st.checkbox('Relation between "Target" variable and the features'):
         df = df_new.drop('target', axis=1)
@@ -198,10 +202,6 @@ with tab3:
             box_plot = sns.boxplot(x='target', y=selected_variable, data=data_vis,palette='rainbow')
             st.pyplot(box_plot.figure)
 
-        #elif data_button == 'Histogram Plot':
-            #histplot = sns.histplot(data=data_vis, x=selected_variable, y='target', binwidth=5, hue='sex')
-            #st.pyplot(histplot.figure)
-
         elif data_button == 'Distribution Plot':
             distplot = sns.displot(data=data_vis, x=selected_variable, y='target', hue='sex')
             st.pyplot(distplot)
@@ -215,7 +215,7 @@ with tab3:
             st.write("*From the plot, there is a visible pattern where one gender has a higher concentration of '1' (indicating the presence of heart disease) while the other has a higher concentration of '0' (indicating no heart disease), it suggests that there may be a relationship between gender ('sex') and the likelihood of heart disease*")
         
         if selected_variable == 'chest_pain_type':
-            st.write("*We can see from the plot, certain values of 'cp' are associated with a higher concentration of '1' (indicating the presence of heart disease) and other values of 'cp' are associated with a higher concentration of '0' (indicating no heart disease), it suggests that the 'cp' variable is related to the likelihood of heart disease*")
+            st.write("*We can see from the plot, certain values of 'chest_pain_type' are associated with a higher concentration of '1' (indicating the presence of heart disease) and other values of 'cp' are associated with a higher concentration of '0' (indicating no heart disease), it suggests that the 'cp' variable is related to the likelihood of heart disease*")
             
         if selected_variable == 'resting_blood_pressure':
             st.write("*Most data points are concentrated at lower resting blood pressure values for '0' (no heart disease), it suggest a negative correlation, indicating that lower resting blood pressure is associated with a lower likelihood of heart disease*")
@@ -228,7 +228,7 @@ with tab3:
             st.write("*Pattern suggest that one group has a higher concentration of '1' (indicating the presence of heart disease) while the other group has a higher concentration of '0' (indicating no heart disease) which implies that high fasting blood sugar levels may be associated with a higher likelihood of heart disease*")
     
         if selected_variable == 'rest_ecg':
-            st.write('One cluster of data points (representing specific "restecg" values) is predominantly associated with a "target" value of "1" (indicating heart disease presence), while another cluster is primarily associated with a "target" value of "0" (indicating no heart disease), it suggests that "restecg" may be related to the likelihood of heart disease.')
+            st.write('One cluster of data points (representing specific "rest_ecg" values) is predominantly associated with a "target" value of "1" (indicating heart disease presence), while another cluster is primarily associated with a "target" value of "0" (indicating no heart disease), it suggests that "restecg" may be related to the likelihood of heart disease.')
         
         if selected_variable == 'max_heart_rate_achieved':
             st.write('*If you see that as heart rate increases, there is a higher concentration of "1" (indicating the presence of heart disease), it suggests a positive correlation. In other words, a higher heart rate might be associated with a higher likelihood of heart disease.*')
@@ -271,14 +271,13 @@ with tab3:
         # Pair-Plot of Continuous Variables
         pairplot = sns.pairplot(data_cont, hue="target", diag_kind="kde", markers=["o", "s"])
         st.pyplot(pairplot.figure)
-        plt.clf()  # Clear the figure
-        st.markdown("*The pair plot will show scatter plots for all pairs of numerical variables in the dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
+        plt.clf()
+        st.markdown("*The pair plot will show scatter plots for all pairs of continuous variables in the dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
 
 # Exploring Relationships
 with tab4:
     
     df_heart = data_vis
-
     # Age vs. Maximum Heart Rate Achieved
     scatter = alt.Chart(df_heart).mark_circle().encode(
         x='age:Q',
@@ -294,11 +293,12 @@ with tab4:
     st.write("*People who have detected maximum heart rate have a high risk of getting heart disease and fall under the age group between 40 and 60*")
 
     # Chest-Pain Type vs. Target
-    fig = px.histogram(df_heart, x='chest_pain_type', color='target', barmode='group', title='Chest Pain Types and Heart Disease')
+    fig = px.histogram(df_heart, x='chest_pain_type', color='target', barmode='group')
+    fig.update_layout(title='Chest Pain Types vs. Heart Disease', xaxis=dict(title='Chest Pain Types (0: typical angina, 1: atypical angina, 2: Non-anginal pain,  3: asymptomatic)'))
     st.plotly_chart(fig)
     plt.clf()
-    st.write("*Each box in the plot represents a different chest pain type (probably categorized into types like 0, 1, 2, or 3)*")
-    st.write("*The box plot helps us to understand how chest pain types are related to the presence of heart disease. For example, we can observe whether a particular chest pain type is more common in individuals with or without heart disease based on the median and the distribution of data points.*")
+    st.write("*The distribution of the 'chest-pain' variable shows how chest pain types are related to the presence of heart disease.*")
+    st.write("*'typical angina' is the most common type of chest pain, representing the largest proportion of individuals in the dataset. The other types of chest pain, 'atypical angina,' 'Non-anginal pain,' 'asymptomatic' have smaller proportions, indicating less common occurrences.*")        
     
     # Age vs. Resting Blood Pressure
     scatter = alt.Chart(df_heart).mark_circle().encode(
@@ -327,8 +327,8 @@ with tab4:
         )
     st.plotly_chart(strip_plot)
     plt.clf()
-    st.write("*The scatter plot show that individuals with higher heart rate tend to be more likelihood of heart disease, as the points cluster in the direction of increasing rate and heart disease presence*")
-
+    st.write("*The strip plot show that individuals with higher heart rate tend to be more likelihood of heart disease, as the points cluster in the direction of increasing rate and heart disease presence*")
+    
 # Model Performance Metrices
 with tab5:
     data = df_model.drop(['slope', 'ca', 'thal'], axis=1)
@@ -489,7 +489,7 @@ with tab5:
         
         st.write('*The provided code creates a bar plot using Seaborn to visualize the accuracy scores of different machine learning algorithms. It uses the scores list containing accuracy values and algorithms list with algorithm names to plot a bar graph with algorithm names on the x-axis and accuracy scores on the y-axis. This visualization helps compare the performance of various algorithms in terms of accuracy.*')
         st.write(" ")
-        st.write("Among the model trained and tested, RandomForestClassifier has overall the best accuracy")
+        st.write("*Among the model trained and tested, RandomForestClassifier has overall the best accuracy*")
 
 ### User Input for Predictions
 def user_input_features():
@@ -548,6 +548,7 @@ key_conclusions_content = """
 - **Age, Cholesterol, and Heart Disease:** Individuals between the ages of 45 and 70 tend to have higher cholesterol levels, indicating a correlation between age and high cholesterol, which contributes to heart disease risk.
 - **Maximum Heart Rate and Age Group:** The maximum heart rate detected is commonly found in individuals between the ages of 40 and 60, showcasing a relationship between age groups and heart rate, which relates to heart disease risk.
 - **Fasting Blood Sugar and Heart Disease Risk:** Individuals without fasting blood sugar (or potentially lower fasting blood sugar levels) have a higher risk of developing heart disease.
+- **Old Peak and Heart Disease:** The 'old peak' (ST depression induced by exercise relative to rest) strongly correlated with heart disease. Higher values of old peak suggest a higher risk of heart disease.
 - **Categorical Variables and Heart Disease:** Categorical variables (such as gender, fasting blood sugar rate, etc.) also show a significant association with the presence of heart disease, indicating their importance in predicting heart disease risk.
 - **Correlation of Age and Maximum Heart Rate with Heart Disease:** Age and maximum heart rate appear to be strongly correlated variables associated with the presence of heart disease. The relationship predictive performance is validated using model metrics.
 """
