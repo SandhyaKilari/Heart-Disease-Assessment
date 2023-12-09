@@ -116,7 +116,7 @@ def preprocess(sex, cp, exang,fbs,restecg):
     return sex, cp, exang,fbs,restecg
 
 # Sections of the Web-Application
-tab1, tab2, tab3, tab4, tab5, tab6, tab7= st.tabs(["Introduction", "Statistical Analysis", "Data Visualization", 'Exploring Relationships', "Classifiers Comparision", "Model Prediction", "Bio"])
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8= st.tabs(["Introduction", "Statistical Analysis", "Data Visualization", 'Exploring Relationships', "Classifiers Comparision", "Model Prediction", "Key-Conclusions", "Bio"])
 
 # Introduction
 with tab1:
@@ -542,8 +542,20 @@ with tab6:
     
         st.write(f"Model Accuracy: {accuracy*100:.2f}%")
 
-# Bio      
+# Key Conclusions
+key_conclusions_content = """
+- **Gender and Heart Disease Risk:** Males exhibit a significantly higher risk of developing heart disease compared to females.
+- **Age, Cholesterol, and Heart Disease:** Individuals between the ages of 45 and 70 tend to have higher cholesterol levels, indicating a correlation between age and high cholesterol, which contributes to heart disease risk.
+- **Maximum Heart Rate and Age Group:** The maximum heart rate detected is commonly found in individuals between the ages of 40 and 60, showcasing a relationship between age groups and heart rate, which relates to heart disease risk.
+- **Fasting Blood Sugar and Heart Disease Risk:** Individuals without fasting blood sugar (or potentially lower fasting blood sugar levels) have a higher risk of developing heart disease.
+- **Categorical Variables and Heart Disease:** Categorical variables (such as gender, fasting blood sugar rate, etc.) also show a significant association with the presence of heart disease, indicating their importance in predicting heart disease risk.
+- **Correlation of Age and Maximum Heart Rate with Heart Disease:** Age and maximum heart rate appear to be strongly correlated variables associated with the presence of heart disease. The relationship predictive performance is validated using model metrics.
+"""
 with tab7:
+    st.markdown(key_conclusions_content)
+    
+# Bio      
+with tab8:
     st.write("Hi there! I am Sandhya Kilari, currently pursuing Master's in Data Science. I'm an avid data scientist, passionate about extracting insights from data using various analytical tools and techniques. My expertise includes machine learning, statistical analysis, and data visualization.")
     st.write(" ")
     st.write("Thriving on challenges, I engage in impactful endeavors that matter. When I'm not diving into data, I love spending time in nature, capturing moments through photography, and honing my culinary skills by experimenting with different cuisines.")
