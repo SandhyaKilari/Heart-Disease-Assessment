@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import altair as alt
 import hiplot as hip
 import numpy as np
+import plotly.express as px
 
 import pickle as pkl
 
@@ -64,7 +65,6 @@ df_new = df_new.drop(['slope', 'ca', 'thal'], axis=1)
 data_vis = df_new
 data_vis.columns = ['age', 'sex', 'chest_pain_type', 'resting_blood_pressure', 'cholesterol', 'fasting_blood_sugar', 'rest_ecg', 'max_heart_rate_achieved',
        'exercise_induced_angina', 'st_depression', 'target']
-
 
 # Information about the App
 st.sidebar.write(
@@ -149,9 +149,7 @@ with tab1:
 with tab2:
     df=df_heart
     if st.checkbox('Raw Data'):
-        row = st.selectbox("Number of rows", range(1, 1025, 1))
-        st.write(f"View the first {row} rows of the dataset")
-        st.table(df.head(row))
+        st.write(df)
     if st.checkbox('Descriptive Statistics'):
         st.write(df.describe())
         st.write('Information about the data:')
@@ -167,7 +165,7 @@ with tab2:
 # Data Visualization
 with tab3:
     categorical_columns = ['sex', 'chest_pain_type', 'fasting_blood_sugar', 'rest_ecg', 'exercise_induced_angina']
-    df_categorical = data_vis[categorical_columns]
+    data_vis[categorical_columns] = data_vis[categorical_columns].astype('category')
     st.markdown('**Which critical risk factors substantially contribute to the occurrence of Heart Disease?**')
 
     if st.checkbox('Distribution of Categorical Variables'):
@@ -269,53 +267,80 @@ with tab3:
 
         st.subheader("Pairplot")
         sns.set(style="ticks")
-        pairplot = sns.pairplot(data_vis, hue="target", diag_kind="kde", markers=["o", "s"])
+        data_cont = data_vis.drop(columns=categorical_columns)
+        # Pair-Plot of Continuous Variables
+        pairplot = sns.pairplot(data_cont, hue="target", diag_kind="kde", markers=["o", "s"])
         st.pyplot(pairplot.figure)
         plt.clf()  # Clear the figure
         st.markdown("*The pair plot will show scatter plots for all pairs of numerical variables in the dataset, with color differentiation for the 'target' variable. This visualization can help you quickly identify patterns and relationships between different features, especially in the context of heart disease diagnosis*")
 
 # Exploring Relationships
 with tab4:
-    # Correlation based analysis
+    
     df_heart = data_vis
-    correlation = df_heart['chest_pain_type'].corr(df_heart['target'])
-    st.subheader(f'Chest Pain Types vs. Heart Disease\nCorrelation: {correlation:.2f}')
-    plt.figure(figsize=(12, 6))  # Adjusted for two side-by-side boxplots
-    cp_0 = df_heart[df_heart['chest_pain_type'] == 0]
-    cp_1 = df_heart[df_heart['chest_pain_type'] != 0]
-    plt.subplot(1, 2, 1)
-    plot1 = sns.boxplot(data=cp_0, x='chest_pain_type', y='target', color='blue')
-    plt.title('Chest Pain Type 0')
-    plt.subplot(1, 2, 2)
-    plot2 = sns.boxplot(data=cp_1, x='chest_pain_type', y='target', color='green')
-    plt.title('Chest Pain Type 1-3')
-    st.pyplot(plot1.figure, plot2.figure)
-    plt.clf()  # Clear the figure
+
+    # Age vs. Maximum Heart Rate Achieved
+    scatter = alt.Chart(df_heart).mark_circle().encode(
+        x='age:Q',
+        y='max_heart_rate_achieved:Q',
+        color='target:N'
+        ).properties(
+            width=750,
+            height=400,
+            title='Age vs. Maximum Heart Rate Achieved'
+        ).interactive()
+    st.altair_chart(scatter)
+    plt.clf()
+    st.write("*People who have detected maximum heart rate have a high risk of getting heart disease and fall under the age group between 40 and 60*")
+
+    # Chest-Pain Type vs. Target
+    fig = px.histogram(df_heart, x='chest_pain_type', color='target', barmode='group', title='Chest Pain Types and Heart Disease')
+    st.plotly_chart(fig)
+    plt.clf()
     st.write("*Each box in the plot represents a different chest pain type (probably categorized into types like 0, 1, 2, or 3)*")
     st.write("*The box plot helps us to understand how chest pain types are related to the presence of heart disease. For example, we can observe whether a particular chest pain type is more common in individuals with or without heart disease based on the median and the distribution of data points.*")
     
-    # Feature Relationship
-    correlation = df_heart['age'].corr(df_heart['resting_blood_pressure'])
-    st.subheader(f'Age vs. Blood Pressure\nCorrelation: {correlation:.2f}')
-    plt.figure(figsize=(10, 10))  # Set a larger figure size
-    plot2 = sns.scatterplot(data=df_heart, x='age', y='resting_blood_pressure', color='green', label= "age vs resting_blood_pressure")
-    st.pyplot(plot2.figure)
-    plt.clf()  # Clear the figure
+    # Age vs. Resting Blood Pressure
+    scatter = alt.Chart(df_heart).mark_circle().encode(
+        x='age:Q',
+        y='resting_blood_pressure:Q',
+        color='target:N'
+        ).properties(
+            width=750,
+            height=400,
+            title='Age vs. Resting Blood Pressure'
+        ).interactive()
+    st.altair_chart(scatter)
+    plt.clf()
     st.write("*Age and blood pressure are positively correlated, meaning that as people get older, their blood pressure tends to increase, which can be a risk factor for heart disease*")
 
-    correlation = df_heart['max_heart_rate_achieved'].corr(df_heart['target'])
-    st.subheader(f'Heart Rate vs. Heart Disease\nCorrelation: {correlation:.2f}')
-    plt.figure(figsize=(8, 6))  # Set a larger figure size
-    plot3 = sns.scatterplot(data=df_heart, x='max_heart_rate_achieved', y='target', color='red', alpha=0.5, label= "max_heart_rate_achieved vs target")
-    st.pyplot(plot3.figure)
-    plt.clf()  # Clear the figure
+    # Heart Rate vs. Heart Disease
+    strip_plot = px.strip(
+        df_heart, x='target', y='max_heart_rate_achieved',
+        color='target', width=750, height=400
+        )
+    
+    strip_plot.update_layout(
+        title="Heart Rate vs. Heart Disease",
+        xaxis_title="0= Heart Disease, 1= No disease",
+        yaxis_title="Max Heart Rate Achieved"
+        )
+    st.plotly_chart(strip_plot)
+    plt.clf()
     st.write("*The scatter plot show that individuals with higher heart rate tend to be more likelihood of heart disease, as the points cluster in the direction of increasing rate and heart disease presence*")
 
+# Model Performance Metrices
 with tab5:
     data = df_model.drop(['slope', 'ca', 'thal'], axis=1)
     X = data.drop('target', axis=1) 
     y = data['target']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    my_scaler = StandardScaler()
+    my_scaler.fit(X_train)  
+    
+    X_train = my_scaler.transform(X_train)
+    X_test = my_scaler.transform(X_test)
         
     st.write("Model Performance Metrices")
         
@@ -485,14 +510,19 @@ def user_input_features():
     features = pd.DataFrame(data, index=[0])
     return features
 
+# Model Prediction
 with tab6:
     data = df_model.drop(['slope', 'ca', 'thal'], axis=1)
     X_test = data.drop('target', axis=1) 
     y_test = data['target']
+
+    my_scaler = StandardScaler()
+    my_scaler.fit(X_test)
+    X_test_scaled = my_scaler.transform(X_test)
     
     def predict(data):
-        return rf_model.predict(data)
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        data_scaled = my_scaler.transform(data)
+        return rf_model.predict(data_scaled)
     
     st.markdown("Can we establish a dependable predictive tool for early detection?")
     st.write(" ")
@@ -500,17 +530,17 @@ with tab6:
     input_df = user_input_features()    
     
     if st.button("Estimate"):
-        # rf_model = RandomForestClassifier(n_estimators=2)
         result = predict(input_df)
-        accuracy = rf_model.score(X_test, y_test)
+        accuracy = rf_model.score(X_test_scaled, y_test)
                 
         if (result[0]== 0):
-            st.subheader('The Person :green[does not have a Heart Disease]')
+            st.subheader('You are predicted to have no Heart Risk')
         else:
-            st.subheader('The Person :red[has Heart Disease]')
+            st.subheader('You are predicted to likely have a Heart Risk')
     
         st.write(f"Model Accuracy: {accuracy*100:.2f}%")
-        
+
+# Bio      
 with tab7:
     st.write("Hi there! I am Sandhya Kilari, currently pursuing Master's in Data Science. I'm an avid data scientist, passionate about extracting insights from data using various analytical tools and techniques. My expertise includes machine learning, statistical analysis, and data visualization.")
     st.write(" ")
