@@ -335,6 +335,7 @@ with tab5:
     X = data.drop('target', axis=1) 
     y = data['target']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train_st = X_train
     
     my_scaler = StandardScaler()
     my_scaler.fit(X_train)  
@@ -387,7 +388,7 @@ with tab5:
             st.write("Logistic Regression is a statistical technique used for binary classification. It estimates the probability of an observation belonging to one of two classes. It uses a sigmoid function to transform input features into probabilities and draws a decision boundary to separate classes. The model learns from labeled data, assigns importance to features, and is evaluated based on its predictive performance using metrics like accuracy, precision, recall, and F1-score.")                                                    
             
     if model == "Naive Bayes":
-        selected_features = st.multiselect("Select Features", list(X_train.columns))
+        selected_features = st.multiselect("Select Features", list(X_train_st.columns))
         if not selected_features:
             st.warning("Please select at least one feature.")
         else:
