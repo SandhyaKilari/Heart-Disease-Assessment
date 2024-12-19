@@ -43,7 +43,7 @@ with open("knn_model.pkl", "rb") as file:
 
 
 # Project    
-st.markdown("<h1 style='text-align: center; font-size: 35px;'> Heart Disease Assessment </h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 35px;'> Heart Disease Risk Assessment </h1>", unsafe_allow_html=True)
 st.markdown(
     "<p style='text-align: center; font-size: 15px;'>Presented by Sandhya Kilari</p>",
     unsafe_allow_html=True
