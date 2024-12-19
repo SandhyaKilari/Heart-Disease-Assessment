@@ -73,7 +73,7 @@ st.sidebar.write(
     "Have you ever wondered what your heart health says about you?"
 )
 image_url = "heart.jpeg" 
-st.sidebar.image(image_url, use_column_width=True)
+st.sidebar.image(image_url, use_container_width=True)
 st.sidebar.info("This web application unravels the tale hidden within your health attributes (e.g., age, sex, cholesterol levels, blood pressure, blood sugar level and more), offering insights into. The app will provide a clear prediction that's easy to understand. It will also explain why each detail is important. This tool helps people understand their health and assists doctors when talking to patients.")
 st.sidebar.text("") 
 st.sidebar.write("Start uncovering your heart's tale by interacting with various features of the app📈")
